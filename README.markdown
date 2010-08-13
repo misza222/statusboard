@@ -4,7 +4,7 @@ REST Status board
 Entities:
   Service: Name, Description
   Event: Name, Description, StartTime
-
+  Admins: Name, email, password
 
 url scheme:
 

@@ -4,16 +4,32 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
+  dm-core: 
+    group: 
+    - :default
+    version: ">= 0"
   sinatra: 
     group: 
     - :default
     version: ">= 0"
+  dm-migrations: 
+    group: 
+    - :default
+    version: ">= 0"
 specs: 
+- addressable: 
+    version: 2.2.0
+- extlib: 
+    version: 0.9.15
+- dm-core: 
+    version: 1.0.0
+- dm-migrations: 
+    version: 1.0.0
 - rack: 
     version: 1.2.1
 - sinatra: 
     version: "1.0"
-hash: 336e408caecd87d21c9df078bdd3ee1da123e6a6
+hash: 70a67a918904c123e9fc4ae8d8ac75bff21587ef
 sources: 
 - Rubygems: 
     uri: http://gemcutter.org
