@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'dm-core'
 require 'dm-migrations'
+require 'dm-validations'
+require 'json'
 
 def create_db_uri
   if ENV['DATABASE_URL']
@@ -29,6 +31,37 @@ class Service
   property :updated_at, DateTime
   
   has n, :events
+  
+  validates_presence_of :name
+  
+  def to_json(*a)
+    {
+      :id => id,
+      :name => name,
+      :description => description
+    }.to_json(*a)
+  end
+end
+
+class Severity
+  include DataMapper::Resource
+  
+  property :id,    Serial
+  property :name,  String, :unique_index => true
+  
+  property :created_at, DateTime
+  property :updated_at, DateTime
+  
+  belongs_to :event
+  
+  validates_presence_of :name
+  
+  def to_json(*a)
+    {
+      :id => id,
+      :name => name
+    }.to_json(*a)
+  end
 end
 
 class Event
@@ -42,4 +75,16 @@ class Event
   property :updated_at, DateTime
   
   belongs_to :service
+  has 1, :severity
+  
+  validates_presence_of :name
+  
+  def to_json(*a)
+    {
+      :id => id,
+      :name => name,
+      :description => description,
+      :severity_id => severity_id
+    }.to_json(*a)
+  end
 end

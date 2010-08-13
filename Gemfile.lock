@@ -1,6 +1,10 @@
 --- 
 dependencies: 
-  rack: 
+  dm-validations: 
+    group: 
+    - :default
+    version: ">= 0"
+  dm-postgres-adapter: 
     group: 
     - :default
     version: ">= 0"
@@ -8,7 +12,15 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
+  rack: 
+    group: 
+    - :default
+    version: ">= 0"
   sinatra: 
+    group: 
+    - :default
+    version: ">= 0"
+  json: 
     group: 
     - :default
     version: ">= 0"
@@ -19,17 +31,29 @@ dependencies:
 specs: 
 - addressable: 
     version: 2.2.0
+- data_objects: 
+    version: 0.10.2
 - extlib: 
     version: 0.9.15
 - dm-core: 
     version: 1.0.0
+- dm-do-adapter: 
+    version: 1.0.0
 - dm-migrations: 
     version: 1.0.0
+- do_postgres: 
+    version: 0.10.2
+- dm-postgres-adapter: 
+    version: 1.0.0
+- dm-validations: 
+    version: 1.0.0
+- json: 
+    version: 1.4.6
 - rack: 
     version: 1.2.1
 - sinatra: 
     version: "1.0"
-hash: 70a67a918904c123e9fc4ae8d8ac75bff21587ef
+hash: 5f94478e092aa5979a35488adafc2651596e4faa
 sources: 
 - Rubygems: 
     uri: http://gemcutter.org
