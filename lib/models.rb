@@ -25,7 +25,7 @@ class Service
   
   property :id,    Serial
   property :name,  String, :unique_index => true
-  property :description,  Text
+  property :description,  Text, :default => ''
   
   property :created_at, DateTime
   property :updated_at, DateTime
@@ -43,39 +43,17 @@ class Service
   end
 end
 
-class Severity
-  include DataMapper::Resource
-  
-  property :id,    Serial
-  property :name,  String, :unique_index => true
-  
-  property :created_at, DateTime
-  property :updated_at, DateTime
-  
-  belongs_to :event
-  
-  validates_presence_of :name
-  
-  def to_json(*a)
-    {
-      :id => id,
-      :name => name
-    }.to_json(*a)
-  end
-end
-
 class Event
   include DataMapper::Resource
   
   property :id,    Serial
   property :name,  String, :unique_index => true
-  property :description,  Text
+  property :description,  Text, :default => ''
   
   property :created_at, DateTime
   property :updated_at, DateTime
   
   belongs_to :service
-  has 1, :severity
   
   validates_presence_of :name
   
@@ -83,8 +61,7 @@ class Event
     {
       :id => id,
       :name => name,
-      :description => description,
-      :severity_id => severity_id
+      :description => description
     }.to_json(*a)
   end
 end
