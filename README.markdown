@@ -1,5 +1,5 @@
-REST Status board
-=================
+RESTful status board
+====================
 
 Entities:
   Service: Name, Description
@@ -12,7 +12,7 @@ url scheme:
   GET  - lists all services
   POST - create new service
   DELETE
-  
+
 /service
   GET  - parameters count=1
   POST - parameters timestamp=now
@@ -22,22 +22,25 @@ url scheme:
 Authentication
 ==============
 
-simple http authentication for anything but GET actions, config option to make it available via secure protocol
+simple http authentication for anything but GET actions
+config to make it available via secure protocol
 
 
 Additional Futures
 ==================
- * Rss feed
+ * xml (rss/atom?) output
  * json output
  * rely upon (if relied upon provider has outage we do as well)
- * twitter integration, blog integration (as plugins) (maybe do both via web hooks?)
+ * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
+ * use yui-css as a base
  * If xmlhttprequest than no layout
 
 V2
 ==
  * authentication for GET actions in v2
  * nagios plugin? 
+ * historical values sliding through when clicking on prev/next (jquery & ajax)
 
 Find domain and polish domain (buy for free @ domeny.pl)
 
