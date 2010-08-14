@@ -21,6 +21,8 @@ get '/:service/?' do
   service = Service.first(:id => params[:service])
   if ! service.nil?
     service.events.all.to_a.to_json
+  else
+    [].to_json
   end
 end
 
