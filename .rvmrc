@@ -1,0 +1,9 @@
+rvm --create ree@statusboard
+
+if [ ! -d ".bundle" ]; then
+        bundle install
+fi
+
+if [ ! -e "Gemfile.lock" ]; then
+        bundle lock
+fi
