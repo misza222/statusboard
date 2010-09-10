@@ -61,7 +61,8 @@ class Event
     {
       :id => id,
       :name => name,
-      :description => description
+      :description => description,
+      :service_id => service_id
     }.to_json(*a)
   end
 end

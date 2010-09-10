@@ -35,6 +35,6 @@ namespace :test do
   
   task :help do
     Rake::Task["db:reset"].invoke
-    require File.dirname(__FILE__) + '/apps/shop/tests/tests'
+    require File.dirname(__FILE__) + '/tests/tests'
   end
 end

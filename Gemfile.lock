@@ -1,12 +1,24 @@
 --- 
 dependencies: 
+  faker: 
+    group: 
+    - :test
+    version: ">= 0"
   dm-validations: 
     group: 
     - :default
     version: ">= 0"
+  shoulda: 
+    group: 
+    - :test
+    version: ">= 0"
+  machinist: 
+    group: 
+    - :test
+    version: ">= 0"
   dm-postgres-adapter: 
     group: 
-    - :default
+    - :production
     version: ">= 0"
   dm-core: 
     group: 
@@ -24,6 +36,10 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
+  dm-sqlite-adapter: 
+    group: 
+    - :development
+    version: ">= 0"
   dm-migrations: 
     group: 
     - :default
@@ -36,24 +52,34 @@ specs:
 - extlib: 
     version: 0.9.15
 - dm-core: 
-    version: 1.0.0
+    version: 1.0.2
 - dm-do-adapter: 
-    version: 1.0.0
+    version: 1.0.2
 - dm-migrations: 
-    version: 1.0.0
+    version: 1.0.2
 - do_postgres: 
     version: 0.10.2
 - dm-postgres-adapter: 
-    version: 1.0.0
+    version: 1.0.2
+- do_sqlite3: 
+    version: 0.10.2
+- dm-sqlite-adapter: 
+    version: 1.0.2
 - dm-validations: 
-    version: 1.0.0
+    version: 1.0.2
+- faker: 
+    version: 0.3.1
 - json: 
     version: 1.4.6
+- machinist: 
+    version: 1.0.6
 - rack: 
     version: 1.2.1
+- shoulda: 
+    version: 2.11.3
 - sinatra: 
     version: "1.0"
-hash: 5f94478e092aa5979a35488adafc2651596e4faa
+hash: 51857e4b7630f397eb68c24889f88bc8af0914f1
 sources: 
 - Rubygems: 
     uri: http://gemcutter.org
