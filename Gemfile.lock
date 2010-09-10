@@ -8,11 +8,15 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
-  shoulda: 
+  haml: 
+    group: 
+    - :default
+    version: ">= 0"
+  machinist: 
     group: 
     - :test
     version: ">= 0"
-  machinist: 
+  shoulda: 
     group: 
     - :test
     version: ">= 0"
@@ -32,6 +36,10 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
+  sinatra-respond_to: 
+    group: 
+    - :default
+    version: ">= 0"
   json: 
     group: 
     - :default
@@ -39,6 +47,10 @@ dependencies:
   dm-sqlite-adapter: 
     group: 
     - :development
+    version: ">= 0"
+  rack-test: 
+    group: 
+    - :test
     version: ">= 0"
   dm-migrations: 
     group: 
@@ -69,17 +81,23 @@ specs:
     version: 1.0.2
 - faker: 
     version: 0.3.1
+- haml: 
+    version: 3.0.18
 - json: 
     version: 1.4.6
 - machinist: 
     version: 1.0.6
 - rack: 
     version: 1.2.1
+- rack-test: 
+    version: 0.5.4
 - shoulda: 
     version: 2.11.3
 - sinatra: 
     version: "1.0"
-hash: 51857e4b7630f397eb68c24889f88bc8af0914f1
+- sinatra-respond_to: 
+    version: 0.5.0
+hash: 61b1ed9f8e22bb75356137d89dcaac9451bbc9f0
 sources: 
 - Rubygems: 
     uri: http://gemcutter.org

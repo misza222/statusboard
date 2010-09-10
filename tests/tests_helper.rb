@@ -4,6 +4,7 @@ require 'bundler/setup'
 require 'test/unit'
 require 'shoulda'
 
+# Blueprint setup
 require 'machinist/data_mapper'
 require 'faker'
 
@@ -22,3 +23,6 @@ def generate_service_with_events(nr_of_events = 15)
   service = Service.make
   nr_of_events.times { Event.make(:service => service) }
 end
+
+# Rack test setup
+require 'rack/test'

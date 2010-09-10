@@ -2,12 +2,21 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'sinatra'
+require 'sinatra/respond_to'
+require 'haml'
 
 require 'lib/models'
 
+Sinatra::Application.register Sinatra::RespondTo
+
 # get status for all services
 get '/' do
-  Service.all.to_a.to_json
+  @services = Service.all
+  
+  respond_to do |format|
+    format.html { haml :index }
+    format.json { @services.to_a.to_json }
+  end
 end
 
 # new service
@@ -19,12 +28,17 @@ post '/' do
 end
 
 # get entries for the service
-get '/:service/?' do
-  service = Service.first(:id => params[:service])
-  if ! service.nil?
-    service.events.all.to_a.to_json
+get %r{/([0-9]+)/?$} do |service_id|
+  service = Service.first(:id => service_id)
+  if service.nil?
+    @events = []
   else
-    [].to_json
+    @events = service.events.all
+  end
+  
+  respond_to do |format|
+    format.html { haml :events }
+    format.json { @events.to_a.to_json }
   end
 end
 

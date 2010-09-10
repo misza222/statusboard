@@ -2,10 +2,12 @@ source :gemcutter
 
 gem 'rack'
 gem 'sinatra'
+gem 'sinatra-respond_to'
+gem 'haml'
+gem 'json'
 gem 'dm-core'
 gem 'dm-migrations'
 gem 'dm-validations'
-gem 'json'
 
 group :production do
   gem 'dm-postgres-adapter'
@@ -19,4 +21,5 @@ group :test do
   gem 'shoulda'
   gem 'machinist'
   gem 'faker'
+  gem 'rack-test'
 end
