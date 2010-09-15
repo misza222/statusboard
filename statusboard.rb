@@ -9,6 +9,11 @@ require 'lib/models'
 
 Sinatra::Application.register Sinatra::RespondTo
 
+
+error 400 do
+  'Input data incorrect'
+end
+
 # get status for all services
 get '/' do
   @services = Service.all
@@ -21,24 +26,26 @@ end
 
 # new service
 post '/' do
-    service = Service.new(params[:service])
-    if ! service.save
-      error "Service not created. Incorrect parameters. Fix and resubmit."
-    end
+  service = Service.create(params[:service])
+  
+  if ! service.save
+    400
+  end
 end
 
 # get entries for the service
-get %r{/([0-9]+)/?$} do |service_id|
-  service = Service.first(:id => service_id)
-  if service.nil?
-    @events = []
-  else
-    @events = service.events.all
-  end
+get '/:service/?' do
+  service = Service.first(:id => params[:service])
   
-  respond_to do |format|
-    format.html { haml :events }
-    format.json { @events.to_a.to_json }
+  if service.nil?
+    404
+  else
+    @events = service.events.all(:limit => 20, :order => [ :created_at.desc ])
+    
+    respond_to do |format|
+      format.html { haml :events }
+      format.json { @events.to_a.to_json }
+    end
   end
 end
 
@@ -49,9 +56,9 @@ post '/:service/?' do
     event = Event.new(params[:event])
     event.service = service
     if ! event.save
-      error "Event not created. Incorrect parameters. Fix and resubmit."
+      400
     end
   else
-    error "Service not found."
+    404
   end
 end

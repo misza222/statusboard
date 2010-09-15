@@ -27,13 +27,13 @@ end
 task :test => :'test:all'
 
 namespace :test do
-  task :all => [:'test:setup', :'test:help']
+  task :all => [:'test:setup', :'test:statusboard']
   
   task :setup do
     ENV['RACK_ENV'] = 'test'
   end
   
-  task :help do
+  task :statusboard do
     Rake::Task["db:reset"].invoke
     require File.dirname(__FILE__) + '/tests/tests'
   end
