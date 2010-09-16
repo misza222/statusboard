@@ -49,7 +49,7 @@ class Event
   include DataMapper::Resource
   
   property :id,    Serial
-  property :name,  String, :unique_index => true
+  property :name,  String
   property :description,  Text, :default => ''
   
   property :created_at, DateTime

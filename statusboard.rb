@@ -27,10 +27,8 @@ end
 # new service
 post '/' do
   service = Service.create(params[:service])
-  
-  if ! service.save
-    400
-  end
+
+  400 unless service.save
 end
 
 # get entries for the service
@@ -52,13 +50,13 @@ end
 # new entry
 post '/:service/?' do
   service = Service.first(:id => params[:service])
-  if ! service.nil?
+  
+  if service.nil?
+    404
+  else
     event = Event.new(params[:event])
     event.service = service
-    if ! event.save
-      400
-    end
-  else
-    404
+    
+    400 unless event.save
   end
 end

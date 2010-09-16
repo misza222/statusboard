@@ -11,19 +11,21 @@ require 'faker'
 require File.dirname(__FILE__) + '/../lib/models'
 
 Service.blueprint do
-  name { Faker::Lorem.words(3) }
+  name { Faker::Lorem.words(3).join(' ') + rand(100000).to_s }
   description { Faker::Lorem.paragraphs }
 end
 
 Event.blueprint do
-  name { Faker::Lorem.words(2) }
-  description { Faker::Lorem.paragraphs }
+  name { Faker::Lorem.words(2).join(' ') }
+  description { Faker::Lorem.paragraphs.join("\n") }
   service { Service.make }
+  created_at { Time.now }
+  updated_at { Time.now }
 end
 
 def generate_service_with_events(nr_of_events = 5)
   service = Service.make
-  nr_of_events.times { |i| Event.make(:service => service, :name => "Event \##{i} #{service.name} #{rand(100000).to_s}") }
+  nr_of_events.times { |i| Event.make(:service => service) }
   service
 end
 
