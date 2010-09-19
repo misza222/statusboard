@@ -1,4 +1,13 @@
--@events.each do |event|
-  %p
-    =event.name
-    =event.description
+.events
+  .service
+    %h1
+      =@service.name
+    %p
+      =@service.description
+  .list
+    -@events.each do |event|
+      .event
+        %h2
+          =event.name
+        %p
+          =event.description

@@ -19,7 +19,7 @@ get '/' do
   @services = Service.all
   
   respond_to do |format|
-    format.html { haml :index }
+    format.html { haml :services, :layout => !request.xhr? }
     format.json { @services.to_a.to_json }
   end
 end
@@ -33,15 +33,15 @@ end
 
 # get entries for the service
 get '/:service/?' do
-  service = Service.first(:id => params[:service])
+  @service = Service.first(:id => params[:service])
   
-  if service.nil?
+  if @service.nil?
     404
   else
-    @events = service.events.all(:limit => 20, :order => [ :created_at.desc ])
+    @events = @service.events.all(:limit => 20, :order => [ :created_at.desc ])
     
     respond_to do |format|
-      format.html { haml :events }
+      format.html { haml :events, :layout => !request.xhr? }
       format.json { @events.to_a.to_json }
     end
   end

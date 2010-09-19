@@ -1,0 +1,10 @@
+.services
+  .list
+    -@services.each do |service|
+      .service
+        %h1
+          =service.name
+        %p
+          =service.description
+        .events
+          %a{:href=>"/#{service.id}/"} Events

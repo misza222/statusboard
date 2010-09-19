@@ -58,7 +58,7 @@ dependencies:
     version: ">= 0"
 specs: 
 - addressable: 
-    version: 2.2.0
+    version: 2.2.1
 - data_objects: 
     version: 0.10.2
 - extlib: 

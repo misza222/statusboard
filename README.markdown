@@ -29,12 +29,10 @@ config to make it available via secure protocol
 Additional Futures
 ==================
  * xml (rss/atom?) output
- * json output
  * rely upon (if relied upon provider has outage we do as well)
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
  * use yui-css as a base
- * If xmlhttprequest than no layout
 
 V2
 ==
