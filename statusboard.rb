@@ -9,6 +9,9 @@ require 'lib/models'
 
 Sinatra::Application.register Sinatra::RespondTo
 
+set :board_name, 'Status board'
+set :board_description, 'Default description'
+
 
 error 400 do
   'Input data incorrect'
