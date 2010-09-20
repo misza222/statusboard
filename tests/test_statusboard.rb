@@ -1,6 +1,9 @@
 require File.dirname(__FILE__) + '/tests_helper'
 require File.dirname(__FILE__) + '/../statusboard'
 
+# to avoid tilts complaints about using builder in a non safe environment
+require 'builder'
+
 class StatusboardTest < Test::Unit::TestCase
   include Test::Unit::Setup
 
@@ -23,6 +26,17 @@ class StatusboardTest < Test::Unit::TestCase
       
       assert last_response.ok?
       assert ! last_response.body.include?("<html")
+      assert last_response.body.include? service.name
+      assert last_response.body.include? service.description
+    end
+    
+    should "list services in rss format" do
+      service = Service.make
+      
+      get '/?format=rss'
+      
+      assert last_response.ok?
+      assert last_response.body.include?("<?xml")
       assert last_response.body.include? service.name
       assert last_response.body.include? service.description
     end
@@ -91,6 +105,18 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.body.include? service.events[0].name
       # as json encodes line break we need to encode description we are testing against
       assert last_response.body.include? service.events[0].description.to_json
+    end
+    
+    should "list events in rss format" do
+      service = generate_service_with_events
+      
+      get "/#{service.id}/?format=rss"
+      
+      assert last_response.ok?
+      assert last_response.body.include?("<?xml")
+      assert last_response.body.include? service.events[0].name
+      # as json encodes line break we need to encode description we are testing against
+      assert last_response.body.include? service.events[0].description
     end
   end
   
