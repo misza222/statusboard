@@ -32,7 +32,7 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
-  sinatra: 
+  json: 
     group: 
     - :default
     version: ">= 0"
@@ -40,7 +40,7 @@ dependencies:
     group: 
     - :default
     version: ">= 0"
-  json: 
+  sinatra: 
     group: 
     - :default
     version: ">= 0"
@@ -52,6 +52,10 @@ dependencies:
     group: 
     - :test
     version: ">= 0"
+  builder: 
+    group: 
+    - :default
+    version: ">= 0"
   dm-migrations: 
     group: 
     - :default
@@ -59,6 +63,8 @@ dependencies:
 specs: 
 - addressable: 
     version: 2.2.1
+- builder: 
+    version: 2.1.2
 - data_objects: 
     version: 0.10.2
 - extlib: 
@@ -97,7 +103,7 @@ specs:
     version: "1.0"
 - sinatra-respond_to: 
     version: 0.5.0
-hash: 61b1ed9f8e22bb75356137d89dcaac9451bbc9f0
+hash: 4a14cadcb8ecba7c03600a74ccfea800f22b5f28
 sources: 
 - Rubygems: 
     uri: http://gemcutter.org

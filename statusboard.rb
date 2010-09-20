@@ -21,6 +21,7 @@ get '/' do
   respond_to do |format|
     format.html { haml :services, :layout => !request.xhr? }
     format.json { @services.to_a.to_json }
+    format.rss  { builder :services }
   end
 end
 
@@ -43,6 +44,7 @@ get '/:service/?' do
     respond_to do |format|
       format.html { haml :events, :layout => !request.xhr? }
       format.json { @events.to_a.to_json }
+      format.rss  { builder :events }
     end
   end
 end

@@ -28,15 +28,13 @@ config to make it available via secure protocol
 
 Additional Futures
 ==================
- * xml (rss/atom?) output
- * rely upon (if relied upon provider has outage we do as well)
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
- * use yui-css as a base
 
 V2
 ==
  * authentication for GET actions in v2
+ * rely upon (if relied upon provider has outage we do as well)
  * nagios plugin? 
  * historical values sliding through when clicking on prev/next (jquery & ajax)
 
