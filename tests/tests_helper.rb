@@ -38,10 +38,12 @@ module Test::Unit::Setup
   def app
     Sinatra::Application.new
   end
-  
-  private
 
   def encode_credentials(username, password)
     "Basic " + Base64.encode64("#{username}:#{password}")
+  end
+  
+  def encode_valid_credentials
+    encode_credentials( Sinatra::Application.admin_user, Sinatra::Application.admin_password )
   end
 end

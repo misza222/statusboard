@@ -19,11 +19,6 @@ url scheme:
   PUT  - v2 updating event?
   DELETE - v2
 
-Authentication
-==============
-config to make it available via secure protocol
-
-
 Additional Futures
 ==================
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
@@ -32,6 +27,7 @@ Additional Futures
 
 V2
 ==
+ * authentication with openID?
  * authentication for GET actions in v2
  * rely upon (if relied upon provider has outage we do as well)
  * nagios plugin? 

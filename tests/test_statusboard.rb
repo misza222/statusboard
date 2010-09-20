@@ -56,7 +56,7 @@ class StatusboardTest < Test::Unit::TestCase
       set :admin_require_ssl, true
       
       post '/', { :'service[name]' => service.name },
-                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert_equal 404, last_response.status
     end
@@ -67,7 +67,7 @@ class StatusboardTest < Test::Unit::TestCase
       set :admin_require_ssl, true
       
       post '/', { :'service[name]' => service.name },
-                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34'), 'HTTP_X_FORWARDED_PROTO' => 'https'}
+                {'HTTP_AUTHORIZATION' => encode_valid_credentials, 'HTTP_X_FORWARDED_PROTO' => 'https'}
       
       assert last_response.ok?
     end
@@ -95,12 +95,12 @@ class StatusboardTest < Test::Unit::TestCase
     
     should "fail if parameters incorrect" do
       post '/', { :'service[name]' => '' },
-                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
       
-      post '/', {}, {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+      post '/', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
@@ -111,7 +111,7 @@ class StatusboardTest < Test::Unit::TestCase
       
       post '/', { :'service[name]' => service.name,
                   :'service[description]' => service.description },
-                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert last_response.ok?
       assert_equal 1, Service.all(:name => service.name).count
@@ -180,7 +180,7 @@ class StatusboardTest < Test::Unit::TestCase
       set :admin_require_ssl, true
       
       post "/#{service.id}/", { :'event[name]' => event.name},
-                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert_equal 404, last_response.status
     end
@@ -192,7 +192,7 @@ class StatusboardTest < Test::Unit::TestCase
       set :admin_require_ssl, true
       
       post "/#{service.id}/", { :'event[name]' => event.name},
-                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34'), 'HTTP_X_FORWARDED_PROTO' => 'https'}
+                {'HTTP_AUTHORIZATION' => encode_valid_credentials , 'HTTP_X_FORWARDED_PROTO' => 'https'}
       
       assert last_response.ok?
     end
@@ -222,7 +222,7 @@ class StatusboardTest < Test::Unit::TestCase
     
     should "return http 404 if service not found" do
       post '/456700988/', { :'event[name]' => 'Error' },
-                          {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                          {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 404, last_response.status
@@ -232,12 +232,12 @@ class StatusboardTest < Test::Unit::TestCase
       service = generate_service_with_events
       
       post "/#{service.id}/", { :'event[name]' => '' },
-                              {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                              {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
       
-      post "/#{service.id}/", {}, {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+      post "/#{service.id}/", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
@@ -249,7 +249,7 @@ class StatusboardTest < Test::Unit::TestCase
       
       post "/#{service.id}/", { :'event[name]' => event.name,
                                 :'event[description]' => event.description },
-                              {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+                              {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert last_response.ok?
       assert_equal event.name, Event.all(:service_id => service.id, :limit => 1, :order => [ :created_at.asc ])[0].name

@@ -3,16 +3,20 @@
 %html{html_attrs}
   %head
     %meta{'http-equiv'=>'Content-Type', :content=>'text/html;charset=utf-8'}
-    %meta{'name'=>'Description', :content => "Status board."}
+    %meta{'name'=>'Description', :content => settings.board_name}
     
-    %title Status board
+    %title
+      =settings.board_name
     
     %link{:type=>'text/css', :rel=>'stylesheet', :href=>'http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css', :media =>'screen'}
     %link{:type=>'text/css', :rel=>'stylesheet', :href=>'main.css', :media =>'screen'}
   %body
     #doc
       #hd
-      
+        #logo
+          =settings.board_name
+          
       #bd
         =yield
+        
       #ft
