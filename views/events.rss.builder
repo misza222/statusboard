@@ -1,9 +1,9 @@
 url = "#{request.scheme}://#{request.host}/#{@service.id}/"
 
 xml.instruct! :xml, :version => '1.0'
-xml.atom :link, :href => 'http://dallas.example.com/rss.xml',
-         :rel => 'self', :type => 'application/rss+xml'
 xml.rss :version => "2.0", :'xmlns:atom' => 'http://www.w3.org/2005/Atom' do
+  xml.atom :link, :href => 'http://dallas.example.com/rss.xml',
+           :rel => 'self', :type => 'application/rss+xml'
   xml.channel do
     xml.title @service.name
     xml.description @service.description
