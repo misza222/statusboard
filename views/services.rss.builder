@@ -2,9 +2,9 @@ url = "#{request.scheme}://#{request.host}/"
 
 xml.instruct! :xml, :version => '1.0'
 xml.rss :version => "2.0", :'xmlns:atom' => 'http://www.w3.org/2005/Atom' do
-  xml.atom :link, :href => "#{url}?format=rss",
-           :rel => 'self', :type => 'application/rss+xml'
   xml.channel do
+    xml.atom :link, :href => "#{url}?format=rss",
+             :rel => 'self', :type => 'application/rss+xml'
     xml.title settings.board_name
     xml.description settings.board_description
     
