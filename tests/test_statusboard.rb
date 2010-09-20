@@ -7,7 +7,13 @@ require 'builder'
 
 class StatusboardTest < Test::Unit::TestCase
   include Test::Unit::Setup
-
+ 
+  def setup
+    # I need to set default config options here as changing it in one of the
+    # tests changes it for good
+    set :admin_require_ssl, false
+  end 
+  
   context "GET on '/'" do
     should "list services in html format" do
       service = Service.make
@@ -44,6 +50,28 @@ class StatusboardTest < Test::Unit::TestCase
   end
   
   context "POST on '/'" do
+    should "return http 404 if :admin_require_ssl is true but client did not request it via https" do
+      service = Service.make_unsaved
+      
+      set :admin_require_ssl, true
+      
+      post '/', { :'service[name]' => service.name },
+                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+      
+      assert_equal 404, last_response.status
+    end
+    
+    should "add record if :admin_require_ssl is true and client requested it via https" do
+      service = Service.make_unsaved
+      
+      set :admin_require_ssl, true
+      
+      post '/', { :'service[name]' => service.name },
+                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34'), 'HTTP_X_FORWARDED_PROTO' => 'https'}
+      
+      assert last_response.ok?
+    end
+    
     should "return http 401 if not authorized" do
       service = Service.make_unsaved
       
@@ -145,6 +173,30 @@ class StatusboardTest < Test::Unit::TestCase
   end
   
   context "POST on '/:service/'" do
+    should "return http 404 if :admin_require_ssl is true but client did not request it via https" do
+      service = generate_service_with_events
+      event = Event.make_unsaved
+      
+      set :admin_require_ssl, true
+      
+      post "/#{service.id}/", { :'event[name]' => event.name},
+                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
+      
+      assert_equal 404, last_response.status
+    end
+    
+    should "add record if :admin_require_ssl is true and client requested it via https" do
+      service = generate_service_with_events
+      event = Event.make_unsaved
+      
+      set :admin_require_ssl, true
+      
+      post "/#{service.id}/", { :'event[name]' => event.name},
+                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34'), 'HTTP_X_FORWARDED_PROTO' => 'https'}
+      
+      assert last_response.ok?
+    end
+    
     should "return http 401 if not authorized" do
       service = generate_service_with_events
       event = Event.make_unsaved

@@ -9,21 +9,28 @@ require 'lib/models'
 
 Sinatra::Application.register Sinatra::RespondTo
 
-set :board_name, 'Status board'
+set :board_name,        'Status board'
 set :board_description, 'Default description'
 
-set :user, 'username'
-set :password, '12password34'
+set :admin_user,        'username'
+set :admin_password,    '12password34'
+set :admin_require_ssl, false
 
 helpers do
   def protected!
-    throw(:halt, [401, "Not found\n"]) unless authorized?
+    throw(:halt, [404, "Not found\n"]) if settings.admin_require_ssl && ! ssl?
+    throw(:halt, [401, "Not authorized\n"]) unless authorized?
   end
 
   def authorized?
     @auth ||=  Rack::Auth::Basic::Request.new(request.env)
     @auth.provided? && @auth.basic? && @auth.credentials &&
-      @auth.credentials == [settings.user, settings.password]
+      @auth.credentials == [settings.admin_user, settings.admin_password]
+  end
+  
+  def ssl?
+    # If https is done with encoding proxy rack may not be aware thus testing HTTP_X_FORWARDED_PROTO header
+    request.scheme == 'https' || env["HTTP_X_FORWARDED_PROTO"] == 'https'
   end
 end
 
