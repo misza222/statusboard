@@ -12,9 +12,19 @@ Sinatra::Application.register Sinatra::RespondTo
 set :board_name, 'Status board'
 set :board_description, 'Default description'
 
+set :user, 'username'
+set :password, '12password34'
 
-error 400 do
-  'Input data incorrect'
+helpers do
+  def protected!
+    throw(:halt, [401, "Not found\n"]) unless authorized?
+  end
+
+  def authorized?
+    @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+    @auth.provided? && @auth.basic? && @auth.credentials &&
+      @auth.credentials == [settings.user, settings.password]
+  end
 end
 
 # get status for all services
@@ -30,6 +40,8 @@ end
 
 # new service
 post '/' do
+  protected!
+  
   service = Service.create(params[:service])
 
   400 unless service.save
@@ -54,6 +66,8 @@ end
 
 # new entry
 post '/:service/?' do
+  protected!
+  
   service = Service.first(:id => params[:service])
   
   if service.nil?

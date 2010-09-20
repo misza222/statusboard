@@ -21,8 +21,6 @@ url scheme:
 
 Authentication
 ==============
-
-simple http authentication for anything but GET actions
 config to make it available via secure protocol
 
 

@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/tests_helper'
 require File.dirname(__FILE__) + '/../statusboard'
+require 'base64'
 
 # to avoid tilts complaints about using builder in a non safe environment
 require 'builder'
@@ -43,13 +44,35 @@ class StatusboardTest < Test::Unit::TestCase
   end
   
   context "POST on '/'" do
+    should "return http 401 if not authorized" do
+      service = Service.make_unsaved
+      
+      post '/', { :'service[name]' => service.name }
+      
+      assert_equal 401, last_response.status
+    end
+    
+    should "return http 401 if wrong credentials" do
+      service = Service.make_unsaved
+      
+      post '/', { :'service[name]' => service.name }
+      
+      assert_equal 401, last_response.status
+      
+      post '/', { :'service[name]' => service.name },
+                {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
+      
+      assert_equal 401, last_response.status
+    end
+    
     should "fail if parameters incorrect" do
-      post '/', { :'service[name]' => '' }
+      post '/', { :'service[name]' => '' },
+                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
       
-      post '/'
+      post '/', {}, {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
@@ -59,7 +82,8 @@ class StatusboardTest < Test::Unit::TestCase
       service = Service.make_unsaved
       
       post '/', { :'service[name]' => service.name,
-                  :'service[description]' => service.description }
+                  :'service[description]' => service.description },
+                {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert last_response.ok?
       assert_equal 1, Service.all(:name => service.name).count
@@ -121,8 +145,32 @@ class StatusboardTest < Test::Unit::TestCase
   end
   
   context "POST on '/:service/'" do
+    should "return http 401 if not authorized" do
+      service = generate_service_with_events
+      event = Event.make_unsaved
+      
+      post "/#{service.id}/", { :'event[name]' => event.name }
+      
+      assert_equal 401, last_response.status
+    end
+    
+    should "return http 401 if wrong credentials" do
+      service = generate_service_with_events
+      event = Event.make_unsaved
+      
+      post "/#{service.id}/", { :'event[name]' => event.name }
+      
+      assert_equal 401, last_response.status
+      
+      post "/#{service.id}/", { :'event[name]' => event.name },
+                              {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
+      
+      assert_equal 401, last_response.status
+    end
+    
     should "return http 404 if service not found" do
-      post '/456700988/', { :'event[name]' => 'Error' }
+      post '/456700988/', { :'event[name]' => 'Error' },
+                          {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert ! last_response.ok?
       assert_equal 404, last_response.status
@@ -131,12 +179,13 @@ class StatusboardTest < Test::Unit::TestCase
     should "fail if parameters incorrect" do
       service = generate_service_with_events
       
-      post "/#{service.id}/", { :'event[name]' => '' }
+      post "/#{service.id}/", { :'event[name]' => '' },
+                              {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
       
-      post "/#{service.id}/"
+      post "/#{service.id}/", {}, {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
@@ -147,7 +196,8 @@ class StatusboardTest < Test::Unit::TestCase
       event = Event.make_unsaved
       
       post "/#{service.id}/", { :'event[name]' => event.name,
-                                :'event[description]' => event.description }
+                                :'event[description]' => event.description },
+                              {'HTTP_AUTHORIZATION' => encode_credentials('username', '12password34')}
       
       assert last_response.ok?
       assert_equal event.name, Event.all(:service_id => service.id, :limit => 1, :order => [ :created_at.asc ])[0].name
