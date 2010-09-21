@@ -199,13 +199,15 @@ class StatusboardTest < Test::Unit::TestCase
       assert_equal 404, last_response.status
     end
     
-    should "show form for adding new service" do
+    should "show form for editing service" do
       service = generate_service_with_events
       
       get "/#{service.id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.ok?
       assert last_response.body.include? "<form"
+      assert last_response.body.include? service.name
+      assert last_response.body.include? service.description
     end
   end
   
@@ -239,6 +241,24 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.ok?
       
       assert_equal service.name + ' Updated', Service.first(:id => service.id).name
+    end
+  end
+  
+  context "GET on '/:service/new'" do
+    should "return http 404 if service not found" do
+      get '/456700988/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
+    end
+    
+    should "show form for adding new event" do
+      service = generate_service_with_events
+      
+      get "/#{service.id}/new", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert last_response.ok?
+      assert last_response.body.include? "<form"
     end
   end
   

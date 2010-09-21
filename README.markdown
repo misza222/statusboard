@@ -11,9 +11,10 @@ url scheme:
 /
   GET  - lists all services
   POST - create new service
-  DELETE
+  PUT  - update service
+  DELETE - delete service
 
-/service
+/service/
   GET  - parameters count=1
   POST - parameters timestamp=now
   PUT  - v2 updating event?
@@ -21,12 +22,13 @@ url scheme:
 
 Additional Futures
 ==================
+ * service by name
  * extract authorization helper tests from testing statusboard
- * if user logged in add edit/delete and new buttons for manipulating entries
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
  * test rss validity in unit tests
-
+ * see older statuses (as currently there is a limit of 20/page)
+ * think of updating statuses as in http://sinatra-book.gittr.com/#status
 V2
 ==
  * authentication with openID?

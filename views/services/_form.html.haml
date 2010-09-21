@@ -1,5 +1,5 @@
-%form{:action=>"/#{@service.id if locals[:method] == 'put'}", :method => 'post'}
-  -if locals[:method] == 'put'
+%form{:action=>"/#{@service.id if method == 'put'}", :method => 'post'}
+  -if method == 'put'
     %input{:type => 'hidden', :name => '_method', :value => 'put'}
   %dl
     %dt
@@ -13,7 +13,7 @@
         :preserve
           #{@service.description}
     %dt
-      -if locals[:method] == 'put'
+      -if method == 'put'
         %input{:type => 'submit', :value => 'Update service'}
       -else
         %input{:type => 'submit', :value => 'Create service'}

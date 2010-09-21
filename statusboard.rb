@@ -116,6 +116,20 @@ put '/:service_id' do
   end
 end
 
+get '/:service_id/new' do
+  protected!
+  
+  @service = Service.first(:id => params[:service_id])
+  
+  if @service.nil?
+    404
+  else
+    @event = Event.new(:service => @service)
+    
+    haml :'events/new'
+  end
+end
+
 # new entry
 post '/:service_id/' do
   protected!

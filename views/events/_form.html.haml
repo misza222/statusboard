@@ -1,0 +1,19 @@
+%form{:action=>"/#{@service.id}/#{@event.id if method == 'put'}", :method => 'post'}
+  -if method == 'put'
+    %input{:type => 'hidden', :name => '_method', :value => 'put'}
+  %dl
+    %dt
+      %label{:for => 'event[name]'} Event name
+    %dd
+      %input{:type => 'text', :name => 'event[name]', :value => @event.name}
+    %dt
+      %label{:for => 'event[description]'} Event description
+    %dd
+      %textarea{:name => 'event[description]'}
+        :preserve
+          #{@event.description}
+    %dt
+      -if method == 'put'
+        %input{:type => 'submit', :value => 'Update event'}
+      -else
+        %input{:type => 'submit', :value => 'Create event'}

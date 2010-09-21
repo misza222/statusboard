@@ -6,5 +6,9 @@
           =service.name
         %p
           =service.description
+        -if authorized?
+          %a.edit{:href => "/#{service.id}/edit"} Edit
         .events
           %a{:href=>"/#{service.id}/"} Events
+  -if authorized?
+    %a.new{:href => '/new'} New service

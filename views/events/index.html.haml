@@ -11,3 +11,5 @@
           =event.name
         %p
           =event.description
+  -if authorized?
+    %a.new{:href => "/#{@service.id}/new"} New service
