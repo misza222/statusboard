@@ -35,6 +35,19 @@ helpers do
     # If https is done with encoding proxy rack may not be aware thus testing HTTP_X_FORWARDED_PROTO header
     request.scheme == 'https' || env["HTTP_X_FORWARDED_PROTO"] == 'https'
   end
+  
+  def get_service_or_404(params)
+    service = nil
+    
+    service = Service.first(:id => params[:service_id]) if %r{^\d+$} =~ params[:service_id]
+    service = Service.first(:name => params[:service_id]) if service.nil?
+    
+    if service.nil?
+      throw(:halt, [404, "Not found\n"])
+    else
+      service
+    end
+  end
 end
 
 get '/login' do
@@ -71,20 +84,16 @@ post '/' do
   400 unless service.save
 end
 
-# get entries for the service
+# get service events by service.name
 get '/:service_id/' do
-  @service = Service.first(:id => params[:service_id])
+  @service = get_service_or_404(params)
   
-  if @service.nil?
-    404
-  else
-    @events = @service.events.all(:limit => 20, :order => [ :created_at.desc ])
-    
-    respond_to do |format|
-      format.html { haml :'events/index', :layout => !request.xhr? }
-      format.json { @events.to_a.to_json }
-      format.rss  { builder :'events/index' }
-    end
+  @events = @service.events.all(:limit => 20, :order => [ :created_at.desc ])
+  
+  respond_to do |format|
+    format.html { haml :'events/index', :layout => !request.xhr? }
+    format.json { @events.to_a.to_json }
+    format.rss  { builder :'events/index' }
   end
 end
 
@@ -92,24 +101,18 @@ end
 get '/:service_id/edit' do
   protected!
   
-  @service = Service.first(:id => params[:service_id])
+  @service = get_service_or_404(params)
   
-  if @service.nil?
-    404
-  else
-    haml :'services/edit'
-  end
+  haml :'services/edit'
 end
 
 # updates service
 put '/:service_id' do
   protected!
   
-  @service = Service.first(:id => params[:service_id])
+  @service = get_service_or_404(params)
   
-  if @service.nil?
-    404
-  elsif params[:service].nil? || params[:service].empty?
+  if params[:service].nil? || params[:service].empty?
     400
   else
     400 unless @service.update(params[:service])
@@ -119,29 +122,20 @@ end
 get '/:service_id/new' do
   protected!
   
-  @service = Service.first(:id => params[:service_id])
+  @service = get_service_or_404(params)
+  @event = Event.new(:service => @service)
   
-  if @service.nil?
-    404
-  else
-    @event = Event.new(:service => @service)
-    
-    haml :'events/new'
-  end
+  haml :'events/new'
 end
 
 # new entry
 post '/:service_id/' do
   protected!
   
-  service = Service.first(:id => params[:service_id])
+  service = get_service_or_404(params)
   
-  if service.nil?
-    404
-  else
-    event = Event.new(params[:event])
-    event.service = service
-    
-    400 unless event.save
-  end
+  event = Event.new(params[:event])
+  event.service = service
+  
+  400 unless event.save
 end

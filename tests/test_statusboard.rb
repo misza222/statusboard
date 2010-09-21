@@ -137,7 +137,7 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "GET on '/:service/'" do
+  context "GET on '/:service_id/'" do
     should "return http 404 if service not found" do
       get '/456700988/'
       
@@ -191,7 +191,7 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "GET on '/:service/edit'" do
+  context "GET on '/:service_id/edit'" do
     should "return http 404 if service not found" do
       get '/456700988/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
@@ -211,7 +211,7 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "PUT on '/:service'" do
+  context "PUT on '/:service_id'" do
     should "return http 404 if service not found" do
       put '/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
@@ -244,7 +244,7 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "GET on '/:service/new'" do
+  context "GET on '/:service_id/new'" do
     should "return http 404 if service not found" do
       get '/456700988/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
@@ -262,7 +262,7 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "POST on '/:service/'" do
+  context "POST on '/:service_id/'" do
     should "return http 404 if service not found" do
       post '/456700988/', { :'event[name]' => 'Error' },
                           {'HTTP_AUTHORIZATION' => encode_valid_credentials }
