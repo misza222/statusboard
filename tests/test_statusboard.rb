@@ -12,7 +12,17 @@ class StatusboardTest < Test::Unit::TestCase
     # I need to set default config options here as changing it in one of the
     # tests changes it for good
     set :admin_require_ssl, false
-  end 
+  end
+  
+  context "GET on '/login'" do
+    should "redirect to '/'" do
+      get '/login', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal '/', last_request.path
+    end
+  end
   
   context "GET on '/'" do
     should "list services in html format" do
@@ -46,6 +56,15 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.body.include?("<?xml")
       assert last_response.body.include? service.name
       assert last_response.body.include? service.description
+    end
+  end
+  
+  context "GET on '/new'" do
+    should "show form for adding new service" do
+      get '/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert last_response.ok?
+      assert last_response.body.include? "<form"
     end
   end
   
@@ -172,54 +191,58 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "POST on '/:service/'" do
-    should "return http 404 if :admin_require_ssl is true but client did not request it via https" do
-      service = generate_service_with_events
-      event = Event.make_unsaved
+  context "GET on '/:service/edit'" do
+    should "return http 404 if service not found" do
+      get '/456700988/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      set :admin_require_ssl, true
-      
-      post "/#{service.id}/", { :'event[name]' => event.name},
-                {'HTTP_AUTHORIZATION' => encode_valid_credentials }
-      
-      assert_equal 403, last_response.status
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
     end
     
-    should "add record if :admin_require_ssl is true and client requested it via https" do
+    should "show form for adding new service" do
       service = generate_service_with_events
-      event = Event.make_unsaved
       
-      set :admin_require_ssl, true
-      
-      post "/#{service.id}/", { :'event[name]' => event.name},
-                {'HTTP_AUTHORIZATION' => encode_valid_credentials , 'HTTP_X_FORWARDED_PROTO' => 'https'}
+      get "/#{service.id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.ok?
+      assert last_response.body.include? "<form"
+    end
+  end
+  
+  context "PUT on '/:service'" do
+    should "return http 404 if service not found" do
+      put '/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
     end
     
-    should "return http 401 if not authorized" do
+    should "fail updating service if parameters incorrect" do
       service = generate_service_with_events
-      event = Event.make_unsaved
       
-      post "/#{service.id}/", { :'event[name]' => event.name }
+      put "/#{service.id}", {:'service[name]' => ''}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert_equal 401, last_response.status
+      assert ! last_response.ok?
+      assert_equal 400, last_response.status
+      
+      put "/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert ! last_response.ok?
+      assert_equal 400, last_response.status
     end
     
-    should "return http 401 if wrong credentials" do
+    should "update service" do
       service = generate_service_with_events
-      event = Event.make_unsaved
       
-      post "/#{service.id}/", { :'event[name]' => event.name }
+      put "/#{service.id}", {:'service[name]' => service.name + ' Updated'}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert_equal 401, last_response.status
+      assert last_response.ok?
       
-      post "/#{service.id}/", { :'event[name]' => event.name },
-                              {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
-      
-      assert_equal 401, last_response.status
+      assert_equal service.name + ' Updated', Service.first(:id => service.id).name
     end
-    
+  end
+  
+  context "POST on '/:service/'" do
     should "return http 404 if service not found" do
       post '/456700988/', { :'event[name]' => 'Error' },
                           {'HTTP_AUTHORIZATION' => encode_valid_credentials }

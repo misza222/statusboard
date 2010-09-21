@@ -1,0 +1,19 @@
+%form{:action=>"/#{@service.id if locals[:method] == 'put'}", :method => 'post'}
+  -if locals[:method] == 'put'
+    %input{:type => 'hidden', :name => '_method', :value => 'put'}
+  %dl
+    %dt
+      %label{:for => 'service[name]'} Service name
+    %dd
+      %input{:type => 'text', :name => 'service[name]', :value => @service.name}
+    %dt
+      %label{:for => 'service[description]'} Service description
+    %dd
+      %textarea{:name => 'service[description]'}
+        :preserve
+          #{@service.description}
+    %dt
+      -if locals[:method] == 'put'
+        %input{:type => 'submit', :value => 'Update service'}
+      -else
+        %input{:type => 'submit', :value => 'Create service'}

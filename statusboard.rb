@@ -24,7 +24,7 @@ helpers do
       throw(:halt, [401, "Not authorized\n"])
     end
   end
-
+  
   def authorized?
     @auth ||=  Rack::Auth::Basic::Request.new(request.env)
     @auth.provided? && @auth.basic? && @auth.credentials &&
@@ -37,15 +37,29 @@ helpers do
   end
 end
 
+get '/login' do
+  protected!
+  
+  redirect '/'
+end
+
 # get status for all services
 get '/' do
   @services = Service.all
   
   respond_to do |format|
-    format.html { haml :services, :layout => !request.xhr? }
+    format.html { haml :'services/index', :layout => !request.xhr? }
     format.json { @services.to_a.to_json }
-    format.rss  { builder :services }
+    format.rss  { builder :'services/index' }
   end
+end
+
+get '/new' do
+  protected!
+  
+  @service = Service.new
+  
+  haml :'services/new'
 end
 
 # new service
@@ -58,8 +72,8 @@ post '/' do
 end
 
 # get entries for the service
-get '/:service/?' do
-  @service = Service.first(:id => params[:service])
+get '/:service_id/' do
+  @service = Service.first(:id => params[:service_id])
   
   if @service.nil?
     404
@@ -67,18 +81,46 @@ get '/:service/?' do
     @events = @service.events.all(:limit => 20, :order => [ :created_at.desc ])
     
     respond_to do |format|
-      format.html { haml :events, :layout => !request.xhr? }
+      format.html { haml :'events/index', :layout => !request.xhr? }
       format.json { @events.to_a.to_json }
-      format.rss  { builder :events }
+      format.rss  { builder :'events/index' }
     end
   end
 end
 
-# new entry
-post '/:service/?' do
+# get form to edit service
+get '/:service_id/edit' do
   protected!
   
-  service = Service.first(:id => params[:service])
+  @service = Service.first(:id => params[:service_id])
+  
+  if @service.nil?
+    404
+  else
+    haml :'services/edit'
+  end
+end
+
+# updates service
+put '/:service_id' do
+  protected!
+  
+  @service = Service.first(:id => params[:service_id])
+  
+  if @service.nil?
+    404
+  elsif params[:service].nil? || params[:service].empty?
+    400
+  else
+    400 unless @service.update(params[:service])
+  end
+end
+
+# new entry
+post '/:service_id/' do
+  protected!
+  
+  service = Service.first(:id => params[:service_id])
   
   if service.nil?
     404
