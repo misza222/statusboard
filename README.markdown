@@ -21,6 +21,7 @@ url scheme:
 
 Additional Futures
 ==================
+ * form that allows to add service and event
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
  * test rss validity in unit tests

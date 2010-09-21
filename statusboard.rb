@@ -18,8 +18,11 @@ set :admin_require_ssl, false
 
 helpers do
   def protected!
-    throw(:halt, [404, "Not found\n"]) if settings.admin_require_ssl && ! ssl?
-    throw(:halt, [401, "Not authorized\n"]) unless authorized?
+    throw(:halt, [403, "Encription required\n"]) if settings.admin_require_ssl && ! ssl?
+    if ! authorized?
+      response['WWW-Authenticate'] = %(Basic realm="#{settings.board_name} Auth")
+      throw(:halt, [401, "Not authorized\n"])
+    end
   end
 
   def authorized?

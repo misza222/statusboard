@@ -58,7 +58,7 @@ class StatusboardTest < Test::Unit::TestCase
       post '/', { :'service[name]' => service.name },
                 { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert_equal 404, last_response.status
+      assert_equal 403, last_response.status
     end
     
     should "add record if :admin_require_ssl is true and client requested it via https" do
@@ -182,7 +182,7 @@ class StatusboardTest < Test::Unit::TestCase
       post "/#{service.id}/", { :'event[name]' => event.name},
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert_equal 404, last_response.status
+      assert_equal 403, last_response.status
     end
     
     should "add record if :admin_require_ssl is true and client requested it via https" do
