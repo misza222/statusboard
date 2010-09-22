@@ -30,6 +30,7 @@ Additional Futures
  * view customization via css stored on the web (link to it as a parameter)
  * test rss validity in unit tests
  * think of updating statuses as in http://sinatra-book.gittr.com/#status
+ * think of caching http://docs.heroku.com/http-caching
 
 V2
 ==
