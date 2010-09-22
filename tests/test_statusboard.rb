@@ -189,6 +189,18 @@ class StatusboardTest < Test::Unit::TestCase
       # as json encodes line break we need to encode description we are testing against
       assert last_response.body.include? service.events[0].description
     end
+    
+    should "get limited number of events with correct offset if limit and page specified" do
+      limit = 5
+      page  = 3
+      
+      service = generate_service_with_events(limit * page * 2)
+      
+      get "/#{service.id}/?limit=#{limit}&page=#{page}&format=json"
+      
+      assert last_response.ok?
+      assert_equal last_response.body, service.events.all(:limit => limit, :offset => limit * page, :order => [ :created_at.desc ]).to_a.to_json
+    end
   end
   
   context "GET on '/:service_id/edit'" do

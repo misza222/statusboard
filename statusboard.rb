@@ -88,7 +88,14 @@ end
 get '/:service_id/' do
   @service = get_service_or_404(params)
   
-  @events = @service.events.all(:limit => 20, :order => [ :created_at.desc ])
+  @limit = params[:limit].to_i
+  @limit = 20 unless @limit > 0
+  @page  = params[:page].to_i
+  @page  = 0 unless @page >= 0 # pages start from 0, so for humans +1
+  
+  @total_events = @service.events.count
+  
+  @events = @service.events.all(:limit => @limit, :offset => @limit * @page, :order => [ :created_at.desc ])
   
   respond_to do |format|
     format.html { haml :'events/index', :layout => !request.xhr? }

@@ -27,7 +27,6 @@ Additional Futures
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
  * test rss validity in unit tests
- * see older statuses (as currently there is a limit of 20/page)
  * think of updating statuses as in http://sinatra-book.gittr.com/#status
 
 V2

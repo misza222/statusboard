@@ -16,11 +16,12 @@ Service.blueprint do
 end
 
 Event.blueprint do
+  created = Time.mktime(2000 + rand(11), rand(12) + 1, rand(31) + 1, rand(24), rand(60), rand(60), rand(60)) 
   name { Faker::Lorem.words(2).join(' ') }
   description { Faker::Lorem.paragraphs.join("\n") }
   service { Service.make }
-  created_at { Time.now }
-  updated_at { Time.now }
+  created_at { created }
+  updated_at { created + rand(10000) }
 end
 
 def generate_service_with_events(nr_of_events = 5)

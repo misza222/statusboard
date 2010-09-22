@@ -1,3 +1,4 @@
+-def build_url(service_id, limit, page); "/#{service_id}/?limit=#{limit}&page=#{page}"; end
 .events
   .service
     %h1
@@ -13,3 +14,11 @@
           =event.description
   -if authorized?
     %a.new{:href => "/#{@service.id}/new"} New service
+  .navigation
+    %p
+      -if @page > 0
+        %a.prev{:href => build_url(@service.id, @limit, @page - 1)} Previous
+      Page
+      =@page + 1
+      -if @total_events > (@page + 1) * @limit
+        %a.next{:href => build_url(@service.id, @limit, @page + 1)} Next
