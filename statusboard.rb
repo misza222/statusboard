@@ -146,3 +146,31 @@ post '/:service_id/' do
   
   400 unless event.save
 end
+
+get '/:service_id/:event_id/edit' do
+  protected!
+  
+  @service = get_service_or_404(params)
+  @event = @service.events.first(:id => params[:event_id])
+  
+  if @event.nil?
+    404
+  else
+    haml :'events/edit'
+  end
+end
+
+put '/:service_id/:event_id' do
+  protected!
+  
+  @service = get_service_or_404(params)
+  @event = @service.events.first(:id => params[:event_id])
+  
+  if @event.nil?
+    404
+  elsif params[:event].nil? || params[:event].empty?
+    400
+  else
+    400 unless @event.update(params[:event])
+  end
+end

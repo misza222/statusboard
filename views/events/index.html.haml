@@ -12,6 +12,8 @@
           =event.name
         %p
           =event.description
+        -if authorized?
+          %a.edit{:href => "/#{@service.id}/#{event.id}/edit"} Edit
   -if authorized?
     %a.new{:href => "/#{@service.id}/new"} New service
   .navigation

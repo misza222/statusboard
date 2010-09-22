@@ -22,6 +22,8 @@ url scheme:
 
 Additional Futures
 ==================
+ * display time next to the incident (in user's local time?)
+ * display last events for each service on '/'
  * extract authorization helper tests from testing statusboard
  * test get_service_or_404
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
@@ -33,7 +35,7 @@ V2
 ==
  * authentication with openID?
  * authentication for GET actions in v2
- * rely upon (if relied upon provider has outage we do as well)
+ * rely upon (if relied upon provider has outage we do as well) (viral function :>)
  * nagios plugin? 
  * historical values sliding through when clicking on prev/next (jquery & ajax)
 

@@ -34,6 +34,10 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.body.include? "<html"
       assert last_response.body.include? service.name
       assert last_response.body.include? service.description
+      
+      get '/', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert last_response.ok?
     end
     
     should "list services in json format" do
@@ -164,6 +168,10 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.body.include? service.events[0].name
       #TODO: because of haml there is a bunch of extra spaces before each paragraph to test below fails
       #assert last_response.body.include? service.events[0].description
+      
+      get "/#{service.id}/", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert last_response.ok?
     end
     
     should "list events in json format" do
@@ -219,7 +227,6 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.ok?
       assert last_response.body.include? "<form"
       assert last_response.body.include? service.name
-      assert last_response.body.include? service.description
     end
   end
   
@@ -308,6 +315,86 @@ class StatusboardTest < Test::Unit::TestCase
       
       assert last_response.ok?
       assert_equal event.name, Event.all(:service_id => service.id, :limit => 1, :order => [ :created_at.asc ])[0].name
+    end
+  end
+  
+  context "GET on '/:service_id/:event_id/edit'" do
+    should "return http 404 if service not found" do
+      get '/456700988/345/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
+    end
+    
+    should "return http 404 if event not found" do
+      service = generate_service_with_events(0)
+      
+      get "/#{service.id}/345/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
+    end
+    
+    should "show form for editing event" do
+      service = generate_service_with_events(5)
+      
+      get "/#{service.id}/#{service.events[2].id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert last_response.ok?
+      assert last_response.body.include? "<form"
+      assert last_response.body.include? service.events[2].name
+    end
+  end
+  
+  context "PUT on '/:service_id/:event_id'" do
+    should "return http 404 if service not found" do
+      put '/456700988/345/edit',
+          { :'event[name]' => 'Test' },
+          {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
+    end
+    
+    should "return http 404 if event not found" do
+      service = generate_service_with_events(0)
+      
+      get "/#{service.id}/345/edit",
+          { :'event[name]' => 'Test' },
+          {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert ! last_response.ok?
+      assert_equal 404, last_response.status
+    end
+    
+    should "fail updating service if parameters incorrect" do
+      service = generate_service_with_events(5)
+      
+      put "/#{service.id}/#{service.events[2].id}",
+          {:'event[name]' => ''},
+          {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert ! last_response.ok?
+      assert_equal 400, last_response.status
+      
+      put "/#{service.id}/#{service.events[2].id}",
+          {},
+          {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert ! last_response.ok?
+      assert_equal 400, last_response.status
+    end
+    
+    should "update service" do
+      service = generate_service_with_events(5)
+      
+      put "/#{service.id}/#{service.events[2].id}",
+          {:'event[name]' => service.events[2].name + ' Updated'},
+          {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      
+      assert last_response.ok?
+      
+      assert_equal service.events[2].name + ' Updated', Event.first(:id => service.events[2].id).name
     end
   end
 end

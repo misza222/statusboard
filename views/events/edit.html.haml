@@ -1,0 +1,7 @@
+%h1
+  Edit
+  =@event.name
+  event in
+  =@service.name
+
+=haml :'events/_form', :layout => false, :locals => {:method => 'put'}
