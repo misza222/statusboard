@@ -12,8 +12,8 @@ Sinatra::Application.register Sinatra::RespondTo
 set :board_name,        'Status board'
 set :board_description, 'Default description'
 
-set :admin_user,        'username'
-set :admin_password,    '12password34'
+set :admin_user,        ENV['ADMIN_USER'] || 'user'
+set :admin_password,    ENV['ADMIN_PASSWORD'] || 'password'
 set :admin_require_ssl, false
 
 helpers do
