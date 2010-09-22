@@ -92,7 +92,9 @@ class StatusboardTest < Test::Unit::TestCase
       post '/', { :'service[name]' => service.name },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials, 'HTTP_X_FORWARDED_PROTO' => 'https'}
       
-      assert last_response.ok?
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal '/', last_request.path
     end
     
     should "return http 401 if not authorized" do
@@ -120,12 +122,10 @@ class StatusboardTest < Test::Unit::TestCase
       post '/', { :'service[name]' => '' },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 400, last_response.status
       
       post '/', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 400, last_response.status
     end
     
@@ -136,7 +136,10 @@ class StatusboardTest < Test::Unit::TestCase
                   :'service[description]' => service.description },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert last_response.ok?
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal '/', last_request.path
+      
       assert_equal 1, Service.all(:name => service.name).count
     end
   end
@@ -234,7 +237,6 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 404 if service not found" do
       put '/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 404, last_response.status
     end
     
@@ -243,12 +245,10 @@ class StatusboardTest < Test::Unit::TestCase
       
       put "/#{service.id}", {:'service[name]' => ''}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 400, last_response.status
       
       put "/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 400, last_response.status
     end
     
@@ -257,7 +257,9 @@ class StatusboardTest < Test::Unit::TestCase
       
       put "/#{service.id}", {:'service[name]' => service.name + ' Updated'}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert last_response.ok?
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal '/', last_request.path
       
       assert_equal service.name + ' Updated', Service.first(:id => service.id).name
     end
@@ -305,7 +307,7 @@ class StatusboardTest < Test::Unit::TestCase
       assert_equal 400, last_response.status
     end
     
-    should "create a service" do
+    should "create an event" do
       service = generate_service_with_events
       event = Event.make_unsaved
       
@@ -313,8 +315,11 @@ class StatusboardTest < Test::Unit::TestCase
                                 :'event[description]' => event.description },
                               {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert last_response.ok?
-      assert_equal event.name, Event.all(:service_id => service.id, :limit => 1, :order => [ :created_at.asc ])[0].name
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal "/#{service.id}/", last_request.path
+      
+      assert_equal event.name, Event.first(:service_id => service.id, :order => [ :created_at.desc ]).name
     end
   end
   
@@ -352,7 +357,6 @@ class StatusboardTest < Test::Unit::TestCase
           { :'event[name]' => 'Test' },
           {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert ! last_response.ok?
       assert_equal 404, last_response.status
     end
     
@@ -363,7 +367,6 @@ class StatusboardTest < Test::Unit::TestCase
           { :'event[name]' => 'Test' },
           {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert ! last_response.ok?
       assert_equal 404, last_response.status
     end
     
@@ -374,14 +377,12 @@ class StatusboardTest < Test::Unit::TestCase
           {:'event[name]' => ''},
           {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 400, last_response.status
       
       put "/#{service.id}/#{service.events[2].id}",
           {},
           {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 400, last_response.status
     end
     
@@ -392,7 +393,9 @@ class StatusboardTest < Test::Unit::TestCase
           {:'event[name]' => service.events[2].name + ' Updated'},
           {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert last_response.ok?
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal "/#{service.id}/", last_request.path
       
       assert_equal service.events[2].name + ' Updated', Event.first(:id => service.events[2].id).name
     end

@@ -81,7 +81,11 @@ post '/' do
   
   service = Service.create(params[:service])
 
-  400 unless service.save
+  if ! service.save
+    400
+  else
+    redirect '/'
+  end
 end
 
 # get service events by service.name
@@ -121,8 +125,10 @@ put '/:service_id' do
   
   if params[:service].nil? || params[:service].empty?
     400
+  elsif ! @service.update(params[:service])
+    400
   else
-    400 unless @service.update(params[:service])
+    redirect '/'
   end
 end
 
@@ -143,8 +149,11 @@ post '/:service_id/' do
   
   event = Event.new(params[:event])
   event.service = service
-  
-  400 unless event.save
+  if ! event.save
+    400
+  else
+    redirect "/#{service.id}/"
+  end
 end
 
 get '/:service_id/:event_id/edit' do
@@ -163,14 +172,16 @@ end
 put '/:service_id/:event_id' do
   protected!
   
-  @service = get_service_or_404(params)
-  @event = @service.events.first(:id => params[:event_id])
+  service = get_service_or_404(params)
+  event = service.events.first(:id => params[:event_id])
   
-  if @event.nil?
+  if event.nil?
     404
   elsif params[:event].nil? || params[:event].empty?
     400
+  elsif ! event.update(params[:event])
+    400
   else
-    400 unless @event.update(params[:event])
+    redirect "/#{service.id}/"
   end
 end

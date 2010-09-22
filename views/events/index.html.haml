@@ -10,12 +10,14 @@
       .event
         %h2
           =event.name
-        %p
+        %p.description
           =event.description
+        %p.time
+          =event.created_at.to_s
         -if authorized?
           %a.edit{:href => "/#{@service.id}/#{event.id}/edit"} Edit
   -if authorized?
-    %a.new{:href => "/#{@service.id}/new"} New service
+    %a.new{:href => "/#{@service.id}/new"} New event
   .navigation
     %p
       -if @page > 0

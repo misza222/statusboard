@@ -4,6 +4,7 @@ require 'bundler/setup'
 require 'dm-core'
 require 'dm-migrations'
 require 'dm-validations'
+require 'dm-timestamps'
 require 'json'
 
 def create_db_uri

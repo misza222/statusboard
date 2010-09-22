@@ -22,7 +22,8 @@ url scheme:
 
 Additional Futures
 ==================
- * display time next to the incident (in user's local time?)
+ * display time of the event in users local time (maybe via jquery plugin)
+ * redirect to appropriate place after successfull creating/update of a record
  * display last events for each service on '/'
  * extract authorization helper tests from testing statusboard
  * test get_service_or_404

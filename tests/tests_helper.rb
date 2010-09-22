@@ -16,7 +16,8 @@ Service.blueprint do
 end
 
 Event.blueprint do
-  created = Time.mktime(2000 + rand(11), rand(12) + 1, rand(31) + 1, rand(24), rand(60), rand(60), rand(60)) 
+  # to ensure that all generated events are in the past the most recent year possible is 2009
+  created = Time.mktime(2000 + rand(10), rand(12) + 1, rand(31) + 1, rand(24), rand(60), rand(60), rand(60)) 
   name { Faker::Lorem.words(2).join(' ') }
   description { Faker::Lorem.paragraphs.join("\n") }
   service { Service.make }
