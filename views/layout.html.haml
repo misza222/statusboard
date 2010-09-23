@@ -15,8 +15,8 @@
       #hd
         #logo
           =settings.board_name
-        #account
-          -if ! authorized?
+        -if ! authorized?
+          #account
             %a{:href => '/login'} Login
       #bd
         =yield
