@@ -9,7 +9,7 @@
       =settings.board_name
     
     %link{:type=>'text/css', :rel=>'stylesheet', :href=>'http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css', :media =>'screen'}
-    %link{:type=>'text/css', :rel=>'stylesheet', :href=>'main.css', :media =>'screen'}
+    %link{:type=>'text/css', :rel=>'stylesheet', :href=>'/stylesheets/main.css', :media =>'screen'}
   %body
     #doc
       #hd
@@ -22,3 +22,5 @@
         =yield
         
       #ft
+        %p.copy
+          &copy 2010 Your company name

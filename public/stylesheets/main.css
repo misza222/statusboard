@@ -1,0 +1,90 @@
+/* General markup settings */
+html {
+  background-color: gray; }
+
+body {
+  font-family: sans-serif; }
+
+h1 {
+  font-size: 167%; }
+
+h2 {
+  font-size: 153.9%; }
+
+h3 {
+  font-size: 138.5%; }
+
+h4 {
+  font-size: 123.1%; }
+
+h1, h2, h3, h4 {
+  margin: 1em 0;
+  font-weight: bold; }
+
+p {
+  font-size: 108%;
+  color: black;
+  text-align: justify; }
+
+p.small {
+  font-size: 93%; }
+
+em {
+  font-weight: bold; }
+
+#hd {
+  padding: 1em;
+  margin: 2em;
+  border: 2px dashed gray;
+  background-color: lightgray;
+}
+
+#hd #logo {
+  font-size: 197%;
+  font-weight: bold;
+  float: left;
+}
+
+#hd #account {
+  float: right;
+}
+
+#bd {
+  padding: 1em;
+  margin: 2em;
+  border: 2px dashed gray;
+  background-color: lightgray;
+}
+
+#ft { 
+  padding: 1em;
+  margin: 2em;
+  border: 2px dashed gray;
+  background-color: lightgray;
+}
+
+#ft p.copy { font-size: 85%; }
+
+.services, .events { }
+
+.events .list {
+  margin-left: 2em;
+}
+
+.admin-actions { }
+
+.service .events { font-weight: bold; float: right; }
+
+.navigation {
+  width: 100%;
+  margin-top: 1em;
+}
+
+.navigation a.prev { margin-right: 2em; }
+.navigation a.next { margin-left: 2em; }
+
+.navigation p {
+  text-align: center;
+}
+
+

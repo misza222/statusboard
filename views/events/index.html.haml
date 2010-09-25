@@ -17,7 +17,8 @@
         -if authorized?
           %a.edit{:href => "/#{@service.id}/#{event.id}/edit"} Edit
   -if authorized?
-    %a.new{:href => "/#{@service.id}/new"} New event
+    .admin-actions
+      %a.new{:href => "/#{@service.id}/new"} New event
   .navigation
     %p
       -if @page > 0
