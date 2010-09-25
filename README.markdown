@@ -22,6 +22,7 @@ url scheme:
 
 Additional Futures
 ==================
+ * style admin-actions, forms
  * display time of the event in users local time (maybe via jquery plugin)
  * display last events for each service on '/'
  * extract authorization helper tests from testing statusboard

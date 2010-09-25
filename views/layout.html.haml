@@ -12,15 +12,15 @@
     %link{:type=>'text/css', :rel=>'stylesheet', :href=>'/stylesheets/main.css', :media =>'screen'}
   %body
     #doc
-      #hd
+      #hd.page-section
         #logo
           =settings.board_name
         -if ! authorized?
           #account
             %a{:href => '/login'} Login
-      #bd
+      #bd.page-section
         =yield
         
-      #ft
-        %p.copy
+      #ft.page-section
+        %p.small
           &copy 2010 Your company name

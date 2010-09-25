@@ -1,41 +1,27 @@
 /* General markup settings */
-html {
-  background-color: gray; }
+html { background-color: gray; }
 
-body {
-  font-family: sans-serif; }
+body { font-family: sans-serif; }
 
-h1 {
-  font-size: 167%; }
+h1 { font-size: 167%; }
+h2 { font-size: 153.9%; }
 
-h2 {
-  font-size: 153.9%; }
-
-h3 {
-  font-size: 138.5%; }
-
-h4 {
-  font-size: 123.1%; }
-
-h1, h2, h3, h4 {
+h1, h2 {
   margin: 1em 0;
-  font-weight: bold; }
+  font-weight: bold;
+}
 
 p {
   font-size: 108%;
   color: black;
   text-align: justify; }
 
-p.small {
-  font-size: 93%; }
+p.small { font-size: 85%; }
 
-em {
-  font-weight: bold; }
-
-#hd {
+.page-section {
   padding: 1em;
   margin: 2em;
-  border: 2px dashed gray;
+  border: 4px dashed gray;
   background-color: lightgray;
 }
 
@@ -49,29 +35,11 @@ em {
   float: right;
 }
 
-#bd {
-  padding: 1em;
-  margin: 2em;
-  border: 2px dashed gray;
-  background-color: lightgray;
-}
-
-#ft { 
-  padding: 1em;
-  margin: 2em;
-  border: 2px dashed gray;
-  background-color: lightgray;
-}
-
-#ft p.copy { font-size: 85%; }
-
-.services, .events { }
-
 .events .list {
   margin-left: 2em;
 }
 
-.admin-actions { }
+.event { border: 2px dashed gray; padding: 1em; margin: 1em; }
 
 .service .events { font-weight: bold; float: right; }
 
@@ -80,11 +48,11 @@ em {
   margin-top: 1em;
 }
 
-.navigation a.prev { margin-right: 2em; }
-.navigation a.next { margin-left: 2em; }
-
 .navigation p {
   text-align: center;
 }
+
+.navigation p a.prev { margin-right: 2em; }
+.navigation p a.next { margin-left: 2em; }
 
 
