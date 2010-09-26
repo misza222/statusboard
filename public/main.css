@@ -62,3 +62,5 @@ p.small { font-size: 85%; }
 .service .admin-actions, .event .admin-actions {
   margin: 0;
 }
+
+#ft p { text-align: center; }

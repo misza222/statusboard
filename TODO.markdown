@@ -13,7 +13,7 @@ V1
  * think of caching http://docs.heroku.com/http-caching
  * better way to store config? (maybe just use in place editing like jeditable)
  * how to enable http caching? Admin on a separate domain?
- 
+
 V2
 ==
  * authentication with openID?
@@ -21,4 +21,3 @@ V2
  * rely upon (if relied upon provider has outage we do as well) (viral function :>)
  * nagios plugin? 
  * historical values sliding through when clicking on prev/next (jquery & ajax)
-
