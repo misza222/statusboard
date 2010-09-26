@@ -59,7 +59,6 @@ helpers do
     "  <input type=\"submit\" value=\"#{caption}\" />"+
     "</form>"
   end
-
 end
 
 get '/login' do
@@ -68,7 +67,6 @@ get '/login' do
   redirect '/'
 end
 
-# get status for all services
 get '/' do
   @services = Service.all
   
@@ -100,7 +98,6 @@ post '/' do
   end
 end
 
-# get service events by service.name
 get '/:service_id/' do
   @service = get_service_or_404(params)
   
@@ -120,7 +117,6 @@ get '/:service_id/' do
   end
 end
 
-# get form to edit service
 get '/:service_id/edit' do
   protected!
   
@@ -129,7 +125,6 @@ get '/:service_id/edit' do
   haml :'services/edit'
 end
 
-# updates service
 put '/:service_id' do
   protected!
   
@@ -153,7 +148,6 @@ get '/:service_id/new' do
   haml :'events/new'
 end
 
-# delete service
 delete '/:service_id' do
   protected!
   
@@ -166,7 +160,6 @@ delete '/:service_id' do
   end
 end
 
-# new entry
 post '/:service_id/' do
   protected!
   

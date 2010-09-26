@@ -11,7 +11,9 @@ V1
  * test rss validity in unit tests
  * think of updating statuses as in http://sinatra-book.gittr.com/#status
  * think of caching http://docs.heroku.com/http-caching
-
+ * better way to store config? (maybe just use in place editing like jeditable)
+ * how to enable http caching? Admin on a separate domain?
+ 
 V2
 ==
  * authentication with openID?
