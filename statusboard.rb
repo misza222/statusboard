@@ -48,6 +48,18 @@ helpers do
       service
     end
   end
+  
+  def button_link_tag(caption, location, options = {})
+    "<input type=\"button\" value=\"#{caption}\" onclick=\"javascript: location.href='#{location}'\" class=\"button\" />"
+  end
+  
+  def button_delete_tag(caption, location, message, options = {})
+    "<form method=\"post\" action=\"#{location}\" onsubmit=\"javascript: return confirm('#{message}')\" style=\"display: inline;\">"+
+    "  <input type=\"hidden\" name=\"_method\" value=\"delete\" />"+
+    "  <input type=\"submit\" value=\"#{caption}\" />"+
+    "</form>"
+  end
+
 end
 
 get '/login' do
@@ -139,6 +151,19 @@ get '/:service_id/new' do
   @event = Event.new(:service => @service)
   
   haml :'events/new'
+end
+
+# delete service
+delete '/:service_id' do
+  protected!
+  
+  @service = get_service_or_404(params)
+  
+  if ! @service.events.destroy || ! @service.destroy
+    400
+  else
+    redirect '/'
+  end
 end
 
 # new entry

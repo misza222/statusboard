@@ -1,27 +1,9 @@
 RESTful status board
 ====================
 
-Entities:
-  Service: Name, Description
-  Event: Name, Description, StartTime
-  Admins: Name, email, password
-
-url scheme:
-
-/
-  GET  - lists all services
-  POST - create new service
-  PUT  - update service
-  DELETE - delete service
-
-/service/
-  GET  - parameters count=1
-  POST - parameters timestamp=now
-  PUT  - v2 updating event?
-  DELETE - v2
-
 Additional Futures
 ==================
+ * Events should not be floated but aligned to the right
  * style admin-actions, forms
  * display time of the event in users local time (maybe via jquery plugin)
  * display last events for each service on '/'

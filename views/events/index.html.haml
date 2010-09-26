@@ -15,10 +15,10 @@
         %p.time
           =event.created_at.to_s
         -if authorized?
-          %a.edit{:href => "/#{@service.id}/#{event.id}/edit"} Edit
+          =button_link_tag('Edit',"/#{@service.id}/#{event.id}/edit")
   -if authorized?
     .admin-actions
-      %a.new{:href => "/#{@service.id}/new"} New event
+      =button_link_tag('New service', "/#{@service.id}/new")
   .navigation
     %p
       -if @page > 0

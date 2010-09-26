@@ -148,7 +148,6 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 404 if service not found" do
       get '/456700988/'
       
-      assert ! last_response.ok?
       assert_equal 404, last_response.status
     end
     
@@ -218,7 +217,6 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 404 if service not found" do
       get '/456700988/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
-      assert ! last_response.ok?
       assert_equal 404, last_response.status
     end
     
@@ -269,7 +267,6 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 404 if service not found" do
       get '/456700988/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
-      assert ! last_response.ok?
       assert_equal 404, last_response.status
     end
     
@@ -280,6 +277,27 @@ class StatusboardTest < Test::Unit::TestCase
       
       assert last_response.ok?
       assert last_response.body.include? "<form"
+    end
+  end
+  
+  context "DELETE on '/:service_id'" do
+    should "return http 404 if service not found" do
+      delete '/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert_equal 404, last_response.status
+    end
+    
+    should "delete service and all the events" do
+      service = generate_service_with_events
+      
+      delete "/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert last_response.redirect?
+      follow_redirect!
+      assert_equal '/', last_request.path
+      
+      assert_equal 0, Event.all(:service_id => service.id).count
+      assert_equal 0, Service.all(:id => service.id).count
     end
   end
   
