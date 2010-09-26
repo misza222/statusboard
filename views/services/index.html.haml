@@ -11,6 +11,9 @@
             =button_link_tag('Edit',"/#{service.id}/edit")
             =button_delete_tag('Delete', "/#{service.id}", "Are you sure you want to delete service and all the events?")
         .events
-          %a{:href=>"/#{service.id}/"} Events
+          %p
+            %a{:href=>"/#{service.id}/"} Events
+  
   -if authorized?
-    =button_link_tag('New service', '/new')
+    .admin-actions
+      =button_link_tag('New service', '/new')

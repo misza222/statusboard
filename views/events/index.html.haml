@@ -15,10 +15,11 @@
         %p.time
           =event.created_at.to_s
         -if authorized?
-          =button_link_tag('Edit',"/#{@service.id}/#{event.id}/edit")
+          .admin-actions
+            =button_link_tag('Edit',"/#{@service.id}/#{event.id}/edit")
   -if authorized?
     .admin-actions
-      =button_link_tag('New service', "/#{@service.id}/new")
+      =button_link_tag('New event', "/#{@service.id}/new")
   .navigation
     %p
       -if @page > 0

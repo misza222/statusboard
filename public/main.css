@@ -41,7 +41,7 @@ p.small { font-size: 85%; }
 
 .event { border: 2px dashed gray; padding: 1em; margin: 1em; }
 
-.service .events { font-weight: bold; float: right; }
+.service .events p { font-weight: bold; text-align: right;}
 
 .navigation {
   width: 100%;
@@ -55,4 +55,10 @@ p.small { font-size: 85%; }
 .navigation p a.prev { margin-right: 2em; }
 .navigation p a.next { margin-left: 2em; }
 
+.services .admin-actions, .events .admin-actions {
+  margin: 1em 0;
+}
 
+.service .admin-actions, .event .admin-actions {
+  margin: 0;
+}
