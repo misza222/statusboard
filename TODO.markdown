@@ -1,10 +1,8 @@
 V1
 ==
- * Events should not be floated but aligned to the right
  * style admin-actions, forms
  * display time of the event in users local time (maybe via jquery plugin)
  * display last events for each service on '/'
- * extract authorization helper tests from testing statusboard
  * test get_service_or_404
  * twitter and blog integration (as plugins?) (maybe do both via web hooks?)
  * view customization via css stored on the web (link to it as a parameter)
