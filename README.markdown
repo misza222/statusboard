@@ -22,11 +22,11 @@ Simple, fast and simple. And of course simple. And fully tested.
 
 Features
 --------
- * configurable http cache control for public pages
  * enforcing ssl for admin interface
  * multiple output format (xhtml, json, atom)
  * dom structure to be easily customizable with css
  * restful, machine friendly interface for simple integration with monitoring tools
+ * configurable http max-age for public pages
 
 How to deploy?
 --------------
