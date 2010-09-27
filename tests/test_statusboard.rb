@@ -35,13 +35,13 @@ class StatusboardTest < Test::Unit::TestCase
     
     should "return http 401 if wrong credentials" do
       get '/admin/some/other/url/', { },
-                {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
+                { 'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password') }
       
       assert_equal 401, last_response.status
     end
 
     should "return 404 if correct credentials on wrong url" do
-      get '/admin/url/with/path', {}, {'HTTP_AUTHORIZATION' => encode_credentials(Sinatra::Application.admin_user, Sinatra::Application.admin_password)}
+      get '/admin/url/with/path', {}, { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert_equal 404, last_response.status
     end

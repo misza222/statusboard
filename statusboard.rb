@@ -19,10 +19,10 @@ set :admin_require_ssl, false
 
 helpers do
   def protected!
-    throw(:halt, [403, "Encription required\n"]) if settings.admin_require_ssl && ! ssl?
+    encription_required! if settings.admin_require_ssl && ! ssl?
     if ! authorized?
       response['WWW-Authenticate'] = %(Basic realm="#{settings.board_name} Auth")
-      throw(:halt, [401, "Not authorized\n"])
+      not_authorized!
     end
   end
   
@@ -48,10 +48,26 @@ helpers do
     service = Service.first(:name => params[:service_id]) if service.nil?
     
     if service.nil?
-      throw(:halt, [404, "Not found\n"])
+      not_found!
     else
       service
     end
+  end
+  
+  def bad_request!
+    throw(:halt, [400, "Bad request\n"])
+  end
+  
+  def not_authorized!
+    throw(:halt, [401, "Not authorized\n"])
+  end
+  
+  def encription_required!
+    throw(:halt, [403, "Encription required\n"])
+  end
+  
+  def not_found!
+    throw(:halt, [404, "Not found\n"])
   end
   
   def button_link_tag(caption, location)
@@ -96,7 +112,7 @@ post '/admin/' do
   service = Service.create(params[:service])
 
   if ! service.save
-    400
+    bad_request!
   else
     redirect '/admin/'
   end
@@ -133,9 +149,9 @@ put '/admin/:service_id' do
   @service = get_service_or_404(params)
   
   if params[:service].nil? || params[:service].empty?
-    400
+    bad_request!
   elsif ! @service.update(params[:service])
-    400
+    bad_request!
   else
     redirect '/admin/'
   end
@@ -152,7 +168,7 @@ delete '/admin/:service_id' do
   @service = get_service_or_404(params)
   
   if ! @service.events.destroy || ! @service.destroy
-    400
+    bad_request!
   else
     redirect '/admin/'
   end
@@ -164,7 +180,7 @@ post '/admin/:service_id/' do
   event = Event.new(params[:event])
   event.service = service
   if ! event.save
-    400
+    bad_request!
   else
     redirect "/admin/#{service.id}/"
   end
@@ -175,7 +191,7 @@ get '/admin/:service_id/:event_id/edit' do
   @event = @service.events.first(:id => params[:event_id])
   
   if @event.nil?
-    404
+    not_found!
   else
     haml :'events/edit'
   end
@@ -186,11 +202,11 @@ put '/admin/:service_id/:event_id' do
   event = service.events.first(:id => params[:event_id])
   
   if event.nil?
-    404
+    not_found!
   elsif params[:event].nil? || params[:event].empty?
-    400
+    bad_request!
   elsif ! event.update(params[:event])
-    400
+    bad_request!
   else
     redirect "/admin/#{service.id}/"
   end
