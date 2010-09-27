@@ -143,9 +143,9 @@ get '/admin/:service_id/new' do
 end
 
 delete '/admin/:service_id' do
-  @service = get_service_or_404(params)
+  service = get_service_or_404(params)
   
-  bad_request! unless @service.events.destroy && @service.destroy
+  bad_request! unless service.events.destroy && service.destroy
   
   redirect '/admin/'
 end
