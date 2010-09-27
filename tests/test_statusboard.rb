@@ -13,6 +13,87 @@ class StatusboardTest < Test::Unit::TestCase
     # tests changes it for good
     set :admin_require_ssl, false
   end
+
+  context "bofore filters" do
+    should "return http 401 if not authorized" do
+      get '/admin/url/with/path'
+      
+      assert_equal 401, last_response.status
+      
+      post '/admin/url/with/path', {}
+      
+      assert_equal 401, last_response.status
+      
+      put '/admin/url/with/path', {}
+      
+      assert_equal 401, last_response.status
+      
+      delete '/admin/url/with/path'
+      
+      assert_equal 401, last_response.status
+    end
+    
+    should "return http 401 if wrong credentials" do
+      get '/admin/some/other/url/', { },
+                {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
+      
+      assert_equal 401, last_response.status
+    end
+
+    should "return 404 if correct credentials on wrong url" do
+      get '/admin/url/with/path', {}, {'HTTP_AUTHORIZATION' => encode_credentials(Sinatra::Application.admin_user, Sinatra::Application.admin_password)}
+      
+      assert_equal 404, last_response.status
+    end
+    
+    should "return http 403 if encryption for admin is required but client did not request it via https" do
+      set :admin_require_ssl, true
+      
+      get '/admin/url/with/path', {}, { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert_equal 403, last_response.status
+      
+      post '/admin/url/with/path', {}, { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert_equal 403, last_response.status
+      
+      put '/admin/url/with/path', {}, { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert_equal 403, last_response.status
+      
+      delete '/admin/url/with/path', {}, { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert_equal 403, last_response.status
+    end
+    
+    should "return http 404 if encryption present when required but url not existent" do
+      set :admin_require_ssl, true
+      
+      get '/admin/url/with/path', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials, 'HTTP_X_FORWARDED_PROTO' => 'https'}
+      
+      assert_equal 404, last_response.status
+    end
+  end
+
+  context "after filters" do
+    should "not cache if admin url" do
+      get '/admin/', {}, { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      
+      assert last_response.headers['Cache-Control'].nil?
+    end
+    
+    should "not cache if request method is not GET" do
+      put '/some/url', {}
+      
+      assert last_response.headers['Cache-Control'].nil?
+    end
+    
+    should "set cache header if not admin url, and request method is GET" do
+      get '/some/url'
+      
+      assert_equal "public, max-age=#{Sinatra::Application.cache_max_age}", last_response.headers['Cache-Control']
+    end
+  end
   
   context "GET on '/' or '/admin/'" do
     should "list services in html format" do
@@ -51,22 +132,6 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.body.include? service.name
       assert last_response.body.include? service.description
     end
-    
-    should "cache (via http header) if not admin url" do
-      service = Service.make
-      
-      get '/'
-      
-     assert_equal 'public, max-age=60', last_response.headers['Cache-Control']
-    end
-    
-    should "not cache if admin url" do
-      service = Service.make
-      
-      get '/admin/'
-      
-     assert last_response.headers['Cache-Control'].nil?
-    end
   end
   
   context "GET on '/admin/new'" do
@@ -79,51 +144,6 @@ class StatusboardTest < Test::Unit::TestCase
   end
   
   context "POST on '/admin/'" do
-    should "return http 404 if :admin_require_ssl is true but client did not request it via https" do
-      service = Service.make_unsaved
-      
-      set :admin_require_ssl, true
-      
-      post '/admin/', { :'service[name]' => service.name },
-                { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
-      
-      assert_equal 403, last_response.status
-    end
-    
-    should "add record if :admin_require_ssl is true and client requested it via https" do
-      service = Service.make_unsaved
-      
-      set :admin_require_ssl, true
-      
-      post '/admin/', { :'service[name]' => service.name },
-                {'HTTP_AUTHORIZATION' => encode_valid_credentials, 'HTTP_X_FORWARDED_PROTO' => 'https'}
-      
-      assert last_response.redirect?
-      follow_redirect!
-      assert_equal '/admin/', last_request.path
-    end
-    
-    should "return http 401 if not authorized" do
-      service = Service.make_unsaved
-      
-      post '/admin/', { :'service[name]' => service.name }
-      
-      assert_equal 401, last_response.status
-    end
-    
-    should "return http 401 if wrong credentials" do
-      service = Service.make_unsaved
-      
-      post '/admin/', { :'service[name]' => service.name }
-      
-      assert_equal 401, last_response.status
-      
-      post '/admin/', { :'service[name]' => service.name },
-                {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
-      
-      assert_equal 401, last_response.status
-    end
-    
     should "fail if parameters incorrect" do
       post '/admin/', { :'service[name]' => '' },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials}
@@ -216,22 +236,6 @@ class StatusboardTest < Test::Unit::TestCase
       
       assert last_response.ok?
       assert_equal last_response.body, service.events.all(:limit => limit, :offset => limit * page, :order => [ :created_at.desc ]).to_a.to_json
-    end
-    
-    should "cache (via http header) if not admin url" do
-      service = generate_service_with_events
-      
-      get "/#{service.id}/"
-      
-     assert_equal 'public, max-age=60', last_response.headers['Cache-Control']
-    end
-    
-    should "not cache if admin url" do
-      service = generate_service_with_events
-      
-      get "/admin/#{service.id}/"
-      
-     assert last_response.headers['Cache-Control'].nil?
     end
   end
   

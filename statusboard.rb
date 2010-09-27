@@ -11,6 +11,7 @@ Sinatra::Application.register Sinatra::RespondTo
 
 set :board_name,        'Status board'
 set :board_description, 'Default description'
+set :cache_max_age,     60 # http cache max_age for public get actions http://tools.ietf.org/html/rfc2616#section-14.9.1
 
 set :admin_user,        ENV['ADMIN_USER'] || 'user'
 set :admin_password,    ENV['ADMIN_PASSWORD'] || 'password'
@@ -37,7 +38,7 @@ helpers do
   end
   
   def admin_url?
-    ! (request.path =~ /^\/admin\//).nil?
+    ! (/^\/admin\// =~ request.path).nil?
   end
   
   def get_service_or_404(params)
@@ -53,11 +54,11 @@ helpers do
     end
   end
   
-  def button_link_tag(caption, location, options = {})
+  def button_link_tag(caption, location)
     "<input type=\"button\" value=\"#{caption}\" onclick=\"javascript: location.href='#{location}'\" class=\"button\" />"
   end
   
-  def button_delete_tag(caption, location, message, options = {})
+  def button_delete_tag(caption, location, message)
     "<form method=\"post\" action=\"#{location}\" onsubmit=\"javascript: return confirm('#{message}')\" style=\"display: inline;\">"+
     "  <input type=\"hidden\" name=\"_method\" value=\"delete\" />"+
     "  <input type=\"submit\" value=\"#{caption}\" />"+
@@ -66,13 +67,11 @@ helpers do
 end
 
 before do
-  if admin_url?
-    # protect all admin urls
-    protected!
-  else
-    # cache all 'public' urls
-    (cache_control :public, :max_age => 60) if request.get?
-  end
+    protected! if admin_url?
+end
+
+after do
+  (cache_control :public, :max_age => settings.cache_max_age) if [404,200].include?(response.status) && request.get? && ! admin_url?
 end
 
 ['/','/admin/'].each do |path|
@@ -93,7 +92,6 @@ get '/admin/new' do
   haml :'services/new'
 end
 
-# new service
 post '/admin/' do
   service = Service.create(params[:service])
 
