@@ -17,15 +17,7 @@ set :admin_user,        ENV['ADMIN_USER'] || 'user'
 set :admin_password,    ENV['ADMIN_PASSWORD'] || 'password'
 set :admin_require_ssl, false
 
-helpers do
-  def protected!
-    encription_required! if settings.admin_require_ssl && ! ssl?
-    if ! authorized?
-      response['WWW-Authenticate'] = %(Basic realm="#{settings.board_name} Auth")
-      not_authorized!
-    end
-  end
-  
+helpers do  
   def authorized?
     @auth ||=  Rack::Auth::Basic::Request.new(request.env)
     @auth.provided? && @auth.basic? && @auth.credentials &&
@@ -43,32 +35,18 @@ helpers do
   
   def get_service_or_404(params)
     service = nil
-    
     service = Service.first(:id => params[:service_id]) if %r{^\d+$} =~ params[:service_id]
     service = Service.first(:name => params[:service_id]) if service.nil?
     
-    if service.nil?
-      not_found!
-    else
-      service
-    end
+    not_found! if service.nil?
+    
+    service
   end
   
-  def bad_request!
-    throw(:halt, [400, "Bad request\n"])
-  end
-  
-  def not_authorized!
-    throw(:halt, [401, "Not authorized\n"])
-  end
-  
-  def encription_required!
-    throw(:halt, [403, "Encription required\n"])
-  end
-  
-  def not_found!
-    throw(:halt, [404, "Not found\n"])
-  end
+  def bad_request!;         throw(:halt, [400, "Bad request\n"]);         end
+  def not_authorized!;      throw(:halt, [401, "Not authorized\n"]);      end
+  def encription_required!; throw(:halt, [403, "Encription required\n"]); end
+  def not_found!;           throw(:halt, [404, "Not found\n"]);           end
   
   def button_link_tag(caption, location)
     "<input type=\"button\" value=\"#{caption}\" onclick=\"javascript: location.href='#{location}'\" class=\"button\" />"
@@ -83,7 +61,13 @@ helpers do
 end
 
 before do
-    protected! if admin_url?
+  if admin_url?
+    encription_required! if settings.admin_require_ssl && ! ssl?
+    if ! authorized?
+      response['WWW-Authenticate'] = %(Basic realm="#{settings.board_name} Auth")
+      not_authorized!
+    end
+  end
 end
 
 after do
@@ -111,11 +95,9 @@ end
 post '/admin/' do
   service = Service.create(params[:service])
 
-  if ! service.save
-    bad_request!
-  else
-    redirect '/admin/'
-  end
+  bad_request! unless service.save
+    
+  redirect '/admin/'
 end
 
 ['/:service_id/','/admin/:service_id/'].each do |path|
@@ -148,13 +130,9 @@ end
 put '/admin/:service_id' do
   @service = get_service_or_404(params)
   
-  if params[:service].nil? || params[:service].empty?
-    bad_request!
-  elsif ! @service.update(params[:service])
-    bad_request!
-  else
-    redirect '/admin/'
-  end
+  bad_request! if params[:service].nil? || params[:service].empty? || ! @service.update(params[:service])
+    
+  redirect '/admin/'
 end
 
 get '/admin/:service_id/new' do
@@ -167,11 +145,9 @@ end
 delete '/admin/:service_id' do
   @service = get_service_or_404(params)
   
-  if ! @service.events.destroy || ! @service.destroy
-    bad_request!
-  else
-    redirect '/admin/'
-  end
+  bad_request! unless @service.events.destroy && @service.destroy
+  
+  redirect '/admin/'
 end
 
 post '/admin/:service_id/' do
@@ -179,35 +155,27 @@ post '/admin/:service_id/' do
   
   event = Event.new(params[:event])
   event.service = service
-  if ! event.save
-    bad_request!
-  else
-    redirect "/admin/#{service.id}/"
-  end
+  
+  bad_request! unless event.save
+  
+  redirect "/admin/#{service.id}/"
 end
 
 get '/admin/:service_id/:event_id/edit' do
   @service = get_service_or_404(params)
   @event = @service.events.first(:id => params[:event_id])
   
-  if @event.nil?
-    not_found!
-  else
-    haml :'events/edit'
-  end
+  not_found! if @event.nil?
+    
+  haml :'events/edit'
 end
 
 put '/admin/:service_id/:event_id' do
   service = get_service_or_404(params)
   event = service.events.first(:id => params[:event_id])
   
-  if event.nil?
-    not_found!
-  elsif params[:event].nil? || params[:event].empty?
-    bad_request!
-  elsif ! event.update(params[:event])
-    bad_request!
-  else
-    redirect "/admin/#{service.id}/"
-  end
+  not_found!   if event.nil?
+  bad_request! if params[:event].nil? || params[:event].empty? || ! event.update(params[:event])
+    
+  redirect "/admin/#{service.id}/"
 end
