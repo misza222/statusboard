@@ -36,6 +36,10 @@ helpers do
     request.scheme == 'https' || env["HTTP_X_FORWARDED_PROTO"] == 'https'
   end
   
+  def admin_url?
+    ! (request.path =~ /^\/admin\//).nil?
+  end
+  
   def get_service_or_404(params)
     service = nil
     
@@ -61,73 +65,73 @@ helpers do
   end
 end
 
-get '/login' do
-  protected!
-  
-  redirect '/'
-end
-
-get '/' do
-  @services = Service.all
-  
-  respond_to do |format|
-    format.html { haml :'services/index', :layout => !request.xhr? }
-    format.json { @services.to_a.to_json }
-    format.rss  { builder :'services/index' }
+before do
+  if admin_url?
+    # protect all admin urls
+    protected!
+  else
+    # cache all 'public' urls
+    (cache_control :public, :max_age => 60) if request.get?
   end
 end
 
-get '/new' do
-  protected!
-  
+['/','/admin/'].each do |path|
+  get path do
+    @services = Service.all
+    
+    respond_to do |format|
+      format.html { haml :'services/index', :layout => !request.xhr? }
+      format.json { @services.to_a.to_json }
+      format.rss  { builder :'services/index' }
+    end
+  end
+end
+
+get '/admin/new' do
   @service = Service.new
   
   haml :'services/new'
 end
 
 # new service
-post '/' do
-  protected!
-  
+post '/admin/' do
   service = Service.create(params[:service])
 
   if ! service.save
     400
   else
-    redirect '/'
+    redirect '/admin/'
   end
 end
 
-get '/:service_id/' do
-  @service = get_service_or_404(params)
-  
-  @limit = params[:limit].to_i
-  @limit = 20 unless @limit > 0
-  @page  = params[:page].to_i
-  @page  = 0 unless @page >= 0 # pages start from 0, so for humans +1
-  
-  @total_events = @service.events.count
-  
-  @events = @service.events.all(:limit => @limit, :offset => @limit * @page, :order => [ :created_at.desc ])
-  
-  respond_to do |format|
-    format.html { haml :'events/index', :layout => !request.xhr? }
-    format.json { @events.to_a.to_json }
-    format.rss  { builder :'events/index' }
+['/:service_id/','/admin/:service_id/'].each do |path|
+  get path do
+    @service = get_service_or_404(params)
+    
+    @limit = params[:limit].to_i
+    @limit = 20 unless @limit > 0
+    @page  = params[:page].to_i
+    @page  = 0 unless @page >= 0 # pages start from 0, so for humans +1
+    
+    @total_events = @service.events.count
+    
+    @events = @service.events.all(:limit => @limit, :offset => @limit * @page, :order => [ :created_at.desc ])
+    
+    respond_to do |format|
+      format.html { haml :'events/index', :layout => !request.xhr? }
+      format.json { @events.to_a.to_json }
+      format.rss  { builder :'events/index' }
+    end
   end
 end
 
-get '/:service_id/edit' do
-  protected!
-  
+get '/admin/:service_id/edit' do
   @service = get_service_or_404(params)
   
   haml :'services/edit'
 end
 
-put '/:service_id' do
-  protected!
-  
+put '/admin/:service_id' do
   @service = get_service_or_404(params)
   
   if params[:service].nil? || params[:service].empty?
@@ -135,34 +139,28 @@ put '/:service_id' do
   elsif ! @service.update(params[:service])
     400
   else
-    redirect '/'
+    redirect '/admin/'
   end
 end
 
-get '/:service_id/new' do
-  protected!
-  
+get '/admin/:service_id/new' do
   @service = get_service_or_404(params)
   @event = Event.new(:service => @service)
   
   haml :'events/new'
 end
 
-delete '/:service_id' do
-  protected!
-  
+delete '/admin/:service_id' do
   @service = get_service_or_404(params)
   
   if ! @service.events.destroy || ! @service.destroy
     400
   else
-    redirect '/'
+    redirect '/admin/'
   end
 end
 
-post '/:service_id/' do
-  protected!
-  
+post '/admin/:service_id/' do
   service = get_service_or_404(params)
   
   event = Event.new(params[:event])
@@ -170,13 +168,11 @@ post '/:service_id/' do
   if ! event.save
     400
   else
-    redirect "/#{service.id}/"
+    redirect "/admin/#{service.id}/"
   end
 end
 
-get '/:service_id/:event_id/edit' do
-  protected!
-  
+get '/admin/:service_id/:event_id/edit' do
   @service = get_service_or_404(params)
   @event = @service.events.first(:id => params[:event_id])
   
@@ -187,9 +183,7 @@ get '/:service_id/:event_id/edit' do
   end
 end
 
-put '/:service_id/:event_id' do
-  protected!
-  
+put '/admin/:service_id/:event_id' do
   service = get_service_or_404(params)
   event = service.events.first(:id => params[:event_id])
   
@@ -200,6 +194,6 @@ put '/:service_id/:event_id' do
   elsif ! event.update(params[:event])
     400
   else
-    redirect "/#{service.id}/"
+    redirect "/admin/#{service.id}/"
   end
 end

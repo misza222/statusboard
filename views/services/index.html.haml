@@ -6,14 +6,14 @@
           =service.name
         %p
           =service.description
-        -if authorized?
+        -if authorized? && admin_url?
           .admin-actions
             =button_link_tag('Edit',"/#{service.id}/edit")
             =button_delete_tag('Delete', "/#{service.id}", "Are you sure you want to delete service and all the events?")
         .events
           %p
-            %a{:href=>"/#{service.id}/"} Events
+            %a{:href=>"/#{admin_url? ? 'admin/' : ''}#{service.id}/"} Events
   
-  -if authorized?
+  -if authorized? && admin_url?
     .admin-actions
       =button_link_tag('New service', '/new')

@@ -14,17 +14,7 @@ class StatusboardTest < Test::Unit::TestCase
     set :admin_require_ssl, false
   end
   
-  context "GET on '/login'" do
-    should "redirect to '/'" do
-      get '/login', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
-      
-      assert last_response.redirect?
-      follow_redirect!
-      assert_equal '/', last_request.path
-    end
-  end
-  
-  context "GET on '/'" do
+  context "GET on '/' or '/admin/'" do
     should "list services in html format" do
       service = Service.make
       
@@ -61,24 +51,40 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.body.include? service.name
       assert last_response.body.include? service.description
     end
+    
+    should "cache (via http header) if not admin url" do
+      service = Service.make
+      
+      get '/'
+      
+     assert_equal 'public, max-age=60', last_response.headers['Cache-Control']
+    end
+    
+    should "not cache if admin url" do
+      service = Service.make
+      
+      get '/admin/'
+      
+     assert last_response.headers['Cache-Control'].nil?
+    end
   end
   
-  context "GET on '/new'" do
+  context "GET on '/admin/new'" do
     should "show form for adding new service" do
-      get '/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      get '/admin/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.ok?
       assert last_response.body.include? "<form"
     end
   end
   
-  context "POST on '/'" do
+  context "POST on '/admin/'" do
     should "return http 404 if :admin_require_ssl is true but client did not request it via https" do
       service = Service.make_unsaved
       
       set :admin_require_ssl, true
       
-      post '/', { :'service[name]' => service.name },
+      post '/admin/', { :'service[name]' => service.name },
                 { 'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert_equal 403, last_response.status
@@ -89,18 +95,18 @@ class StatusboardTest < Test::Unit::TestCase
       
       set :admin_require_ssl, true
       
-      post '/', { :'service[name]' => service.name },
+      post '/admin/', { :'service[name]' => service.name },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials, 'HTTP_X_FORWARDED_PROTO' => 'https'}
       
       assert last_response.redirect?
       follow_redirect!
-      assert_equal '/', last_request.path
+      assert_equal '/admin/', last_request.path
     end
     
     should "return http 401 if not authorized" do
       service = Service.make_unsaved
       
-      post '/', { :'service[name]' => service.name }
+      post '/admin/', { :'service[name]' => service.name }
       
       assert_equal 401, last_response.status
     end
@@ -108,23 +114,23 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 401 if wrong credentials" do
       service = Service.make_unsaved
       
-      post '/', { :'service[name]' => service.name }
+      post '/admin/', { :'service[name]' => service.name }
       
       assert_equal 401, last_response.status
       
-      post '/', { :'service[name]' => service.name },
+      post '/admin/', { :'service[name]' => service.name },
                 {'HTTP_AUTHORIZATION' => encode_credentials('some-username', 'wrong-password')}
       
       assert_equal 401, last_response.status
     end
     
     should "fail if parameters incorrect" do
-      post '/', { :'service[name]' => '' },
+      post '/admin/', { :'service[name]' => '' },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 400, last_response.status
       
-      post '/', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      post '/admin/', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 400, last_response.status
     end
@@ -132,19 +138,19 @@ class StatusboardTest < Test::Unit::TestCase
     should "create a service" do
       service = Service.make_unsaved
       
-      post '/', { :'service[name]' => service.name,
+      post '/admin/', { :'service[name]' => service.name,
                   :'service[description]' => service.description },
                 {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert last_response.redirect?
       follow_redirect!
-      assert_equal '/', last_request.path
+      assert_equal '/admin/', last_request.path
       
       assert_equal 1, Service.all(:name => service.name).count
     end
   end
   
-  context "GET on '/:service_id/'" do
+  context "GET on '/:service_id/' or '/admin/:service_id/'" do
     should "return http 404 if service not found" do
       get '/456700988/'
       
@@ -211,11 +217,27 @@ class StatusboardTest < Test::Unit::TestCase
       assert last_response.ok?
       assert_equal last_response.body, service.events.all(:limit => limit, :offset => limit * page, :order => [ :created_at.desc ]).to_a.to_json
     end
+    
+    should "cache (via http header) if not admin url" do
+      service = generate_service_with_events
+      
+      get "/#{service.id}/"
+      
+     assert_equal 'public, max-age=60', last_response.headers['Cache-Control']
+    end
+    
+    should "not cache if admin url" do
+      service = generate_service_with_events
+      
+      get "/admin/#{service.id}/"
+      
+     assert last_response.headers['Cache-Control'].nil?
+    end
   end
   
-  context "GET on '/:service_id/edit'" do
+  context "GET on '/admin/:service_id/edit'" do
     should "return http 404 if service not found" do
-      get '/456700988/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      get '/admin/456700988/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 404, last_response.status
     end
@@ -223,7 +245,7 @@ class StatusboardTest < Test::Unit::TestCase
     should "show form for editing service" do
       service = generate_service_with_events
       
-      get "/#{service.id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      get "/admin/#{service.id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.ok?
       assert last_response.body.include? "<form"
@@ -231,9 +253,9 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "PUT on '/:service_id'" do
+  context "PUT on '/admin/:service_id'" do
     should "return http 404 if service not found" do
-      put '/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      put '/admin/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 404, last_response.status
     end
@@ -241,11 +263,11 @@ class StatusboardTest < Test::Unit::TestCase
     should "fail updating service if parameters incorrect" do
       service = generate_service_with_events
       
-      put "/#{service.id}", {:'service[name]' => ''}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      put "/admin/#{service.id}", {:'service[name]' => ''}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 400, last_response.status
       
-      put "/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      put "/admin/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 400, last_response.status
     end
@@ -253,19 +275,19 @@ class StatusboardTest < Test::Unit::TestCase
     should "update service" do
       service = generate_service_with_events
       
-      put "/#{service.id}", {:'service[name]' => service.name + ' Updated'}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      put "/admin/#{service.id}", {:'service[name]' => service.name + ' Updated'}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.redirect?
       follow_redirect!
-      assert_equal '/', last_request.path
+      assert_equal '/admin/', last_request.path
       
       assert_equal service.name + ' Updated', Service.first(:id => service.id).name
     end
   end
   
-  context "GET on '/:service_id/new'" do
+  context "GET on '/admin/:service_id/new'" do
     should "return http 404 if service not found" do
-      get '/456700988/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      get '/admin/456700988/new', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert_equal 404, last_response.status
     end
@@ -273,16 +295,16 @@ class StatusboardTest < Test::Unit::TestCase
     should "show form for adding new event" do
       service = generate_service_with_events
       
-      get "/#{service.id}/new", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
+      get "/admin/#{service.id}/new", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.ok?
       assert last_response.body.include? "<form"
     end
   end
   
-  context "DELETE on '/:service_id'" do
+  context "DELETE on '/admin/:service_id'" do
     should "return http 404 if service not found" do
-      delete '/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      delete '/admin/456700988', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert_equal 404, last_response.status
     end
@@ -290,20 +312,20 @@ class StatusboardTest < Test::Unit::TestCase
     should "delete service and all the events" do
       service = generate_service_with_events
       
-      delete "/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      delete "/admin/#{service.id}", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert last_response.redirect?
       follow_redirect!
-      assert_equal '/', last_request.path
+      assert_equal '/admin/', last_request.path
       
       assert_equal 0, Event.all(:service_id => service.id).count
       assert_equal 0, Service.all(:id => service.id).count
     end
   end
   
-  context "POST on '/:service_id/'" do
+  context "POST on '/admin/:service_id/'" do
     should "return http 404 if service not found" do
-      post '/456700988/', { :'event[name]' => 'Error' },
+      post '/admin/456700988/', { :'event[name]' => 'Error' },
                           {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
@@ -313,13 +335,13 @@ class StatusboardTest < Test::Unit::TestCase
     should "fail if parameters incorrect" do
       service = generate_service_with_events
       
-      post "/#{service.id}/", { :'event[name]' => '' },
+      post "/admin/#{service.id}/", { :'event[name]' => '' },
                               {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
       
-      post "/#{service.id}/", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      post "/admin/#{service.id}/", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 400, last_response.status
@@ -329,21 +351,21 @@ class StatusboardTest < Test::Unit::TestCase
       service = generate_service_with_events
       event = Event.make_unsaved
       
-      post "/#{service.id}/", { :'event[name]' => event.name,
+      post "/admin/#{service.id}/", { :'event[name]' => event.name,
                                 :'event[description]' => event.description },
                               {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert last_response.redirect?
       follow_redirect!
-      assert_equal "/#{service.id}/", last_request.path
+      assert_equal "/admin/#{service.id}/", last_request.path
       
       assert_equal event.name, Event.first(:service_id => service.id, :order => [ :created_at.desc ]).name
     end
   end
   
-  context "GET on '/:service_id/:event_id/edit'" do
+  context "GET on '/admin/:service_id/:event_id/edit'" do
     should "return http 404 if service not found" do
-      get '/456700988/345/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      get '/admin/456700988/345/edit', {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 404, last_response.status
@@ -352,7 +374,7 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 404 if event not found" do
       service = generate_service_with_events(0)
       
-      get "/#{service.id}/345/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      get "/admin/#{service.id}/345/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert ! last_response.ok?
       assert_equal 404, last_response.status
@@ -361,7 +383,7 @@ class StatusboardTest < Test::Unit::TestCase
     should "show form for editing event" do
       service = generate_service_with_events(5)
       
-      get "/#{service.id}/#{service.events[2].id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
+      get "/admin/#{service.id}/#{service.events[2].id}/edit", {}, {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
       assert last_response.ok?
       assert last_response.body.include? "<form"
@@ -369,9 +391,9 @@ class StatusboardTest < Test::Unit::TestCase
     end
   end
   
-  context "PUT on '/:service_id/:event_id'" do
+  context "PUT on '/admin/:service_id/:event_id'" do
     should "return http 404 if service not found" do
-      put '/456700988/345/edit',
+      put '/admin/456700988/345/edit',
           { :'event[name]' => 'Test' },
           {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
@@ -381,7 +403,7 @@ class StatusboardTest < Test::Unit::TestCase
     should "return http 404 if event not found" do
       service = generate_service_with_events(0)
       
-      get "/#{service.id}/345/edit",
+      get "/admin/#{service.id}/345/edit",
           { :'event[name]' => 'Test' },
           {'HTTP_AUTHORIZATION' => encode_valid_credentials }
       
@@ -391,13 +413,13 @@ class StatusboardTest < Test::Unit::TestCase
     should "fail updating service if parameters incorrect" do
       service = generate_service_with_events(5)
       
-      put "/#{service.id}/#{service.events[2].id}",
+      put "/admin/#{service.id}/#{service.events[2].id}",
           {:'event[name]' => ''},
           {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert_equal 400, last_response.status
       
-      put "/#{service.id}/#{service.events[2].id}",
+      put "/admin/#{service.id}/#{service.events[2].id}",
           {},
           {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
@@ -407,13 +429,13 @@ class StatusboardTest < Test::Unit::TestCase
     should "update service" do
       service = generate_service_with_events(5)
       
-      put "/#{service.id}/#{service.events[2].id}",
+      put "/admin/#{service.id}/#{service.events[2].id}",
           {:'event[name]' => service.events[2].name + ' Updated'},
           {'HTTP_AUTHORIZATION' => encode_valid_credentials}
       
       assert last_response.redirect?
       follow_redirect!
-      assert_equal "/#{service.id}/", last_request.path
+      assert_equal "/admin/#{service.id}/", last_request.path
       
       assert_equal service.events[2].name + ' Updated', Event.first(:id => service.events[2].id).name
     end

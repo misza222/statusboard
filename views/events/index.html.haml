@@ -1,4 +1,4 @@
--def build_url(service_id, limit, page); "/#{service_id}/?limit=#{limit}&page=#{page}"; end
+-def build_url(service_id, limit, page); "/#{admin_url? ? 'admin/' : ''}#{service_id}/?limit=#{limit}&page=#{page}"; end
 .events
   .service
     %h1
@@ -14,10 +14,10 @@
           =event.description
         %p.time
           =event.created_at.to_s
-        -if authorized?
+        -if authorized? && admin_url?
           .admin-actions
             =button_link_tag('Edit',"/#{@service.id}/#{event.id}/edit")
-  -if authorized?
+  -if authorized? && admin_url?
     .admin-actions
       =button_link_tag('New event', "/#{@service.id}/new")
   .navigation

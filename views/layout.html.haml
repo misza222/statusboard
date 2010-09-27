@@ -15,9 +15,6 @@
       #hd.page-section
         #logo
           =settings.board_name
-        -if ! authorized?
-          #account
-            %a{:href => '/login'} Login
       #bd.page-section
         =yield
         
