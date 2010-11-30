@@ -12,7 +12,7 @@
             =button_delete_tag('Delete', "/#{service.id}", "Are you sure you want to delete service and all the events?")
         .events
           %p
-            %a{:href=>"/#{admin_url? ? 'admin/' : ''}#{service.id}/"} Events
+            =link_tag("Events", "/#{service.id}/")
   
   -if authorized? && admin_url?
     .admin-actions

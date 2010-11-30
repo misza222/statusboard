@@ -1,4 +1,4 @@
--def build_url(service_id, limit, page); "/#{admin_url? ? 'admin/' : ''}#{service_id}/?limit=#{limit}&page=#{page}"; end
+-def build_url(service_id, limit, page); get_full_url_by_location("#{service_id}/?limit=#{limit}&page=#{page}"); end
 .events
   .service
     %h1

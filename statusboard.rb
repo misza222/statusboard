@@ -49,14 +49,22 @@ helpers do
   def not_found!;           throw(:halt, [404, "Not found\n"]);           end
   
   def button_link_tag(caption, location)
-    "<input type=\"button\" value=\"#{caption}\" onclick=\"javascript: location.href='#{location}'\" class=\"button\" />"
+    "<input type=\"button\" value=\"#{caption}\" onclick=\"javascript: location.href='#{get_full_url_by_location(location)}'\" class=\"button\" />"
+  end
+  
+  def link_tag(caption, location)
+    "<a href='#{get_full_url_by_location(location)}'>#{caption}</a>"
   end
   
   def button_delete_tag(caption, location, message)
-    "<form method=\"post\" action=\"#{location}\" onsubmit=\"javascript: return confirm('#{message}')\" style=\"display: inline;\">"+
+    "<form method=\"post\" action=\"#{get_full_url_by_location(location)}\" onsubmit=\"javascript: return confirm('#{message}')\" style=\"display: inline;\">"+
     "  <input type=\"hidden\" name=\"_method\" value=\"delete\" />"+
     "  <input type=\"submit\" value=\"#{caption}\" />"+
     "</form>"
+  end
+  
+  def get_full_url_by_location(location)
+    "#{admin_url? ? '/admin' : ''}#{location}"
   end
 end
 
