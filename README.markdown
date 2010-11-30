@@ -12,13 +12,13 @@ As you know that play with demo and you will be flying.
 
 Demo
 ----
-[public website](http://statusboard.heroku.com)
+[public website](http://rstatusboard.heroku.com)
 
-[admin interface](http://statusboard.heroku.com/admin/) Login: user, Password: password
+[admin interface](http://rstatusboard.heroku.com/admin/) Login: user, Password: password
 
 What was the idea?
 ------------------
-Simple, fast and simple. And of course simple. And fully tested.
+Simple, fast and simple. And fully tested.
 
 Features
 --------
@@ -30,4 +30,12 @@ Features
 
 How to deploy?
 --------------
-It is really easy to deploy it on heroku. Just clone repo from github, create application on heroku, push to heroku and off you go. It would be good to change default admin_user and admin_password. Application accepts env variables. As this version of status board is using simple http authentication which sends passwords as a clear text through the wire it is a good idea to enforce ssl for all admin actions. To do this you need to install ssl addon and update application config. 
+
+Deploying on heroku
+===================
+It is really easy to deploy it on heroku. Just clone repo from github, create application on heroku, push to heroku and off you go. It is necessary to change default admin_user and admin_password. Application accepts env variables. As this version of status board is using simple http authentication which sends passwords as a clear text through the wire it is a good idea to enforce ssl for all admin actions. To do this you need to install ssl addon and update application config.
+
+Best practices
+--------------
+ * This is really obvious but I have to mention it. Do deploy status board in a separate geographical location than application it is providing status for (unless you have no choice).
+ * Change password by updating statusboard.rb or setting environmental variable.
