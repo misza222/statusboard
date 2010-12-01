@@ -15,7 +15,11 @@ class EventModelTest < Test::Unit::TestCase
     end
     
     should "have associated service to be saved" do
-      assert ! Event.new(:name => "test name").save
+      begin
+        assert ! Event.new(:name => "test name").save
+      rescue DataObjects::IntegrityError, DataMapper::SaveFailureError
+        assert true
+      end
     end
     
     context "to_json method" do

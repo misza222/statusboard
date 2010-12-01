@@ -25,6 +25,8 @@ p.small { font-size: 85%; }
   background-color: lightgray;
 }
 
+#hd {}
+
 #hd #logo {
   font-size: 197%;
   font-weight: bold;
@@ -34,6 +36,8 @@ p.small { font-size: 85%; }
 #hd #account {
   float: right;
 }
+
+#bd {}
 
 .events .list {
   margin-left: 2em;
@@ -62,5 +66,7 @@ p.small { font-size: 85%; }
 .service .admin-actions, .event .admin-actions {
   margin: 0;
 }
+
+#ft {}
 
 #ft p { text-align: center; }

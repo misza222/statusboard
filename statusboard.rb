@@ -11,11 +11,11 @@ Sinatra::Application.register Sinatra::RespondTo
 
 set :board_name,        'Status board'
 set :board_description, 'Default description'
-set :cache_max_age,     60 # http cache max_age for public get actions http://tools.ietf.org/html/rfc2616#section-14.9.1
+set :cache_max_age,     60 # in seconds; http cache max_age for public get actions http://tools.ietf.org/html/rfc2616#section-14.9.1
 
-set :admin_user,        ENV['ADMIN_USER'] || 'user'
-set :admin_password,    ENV['ADMIN_PASSWORD'] || 'password'
-set :admin_require_ssl, false
+set :admin_user,        ENV['ADMIN_USER']                  || 'user'
+set :admin_password,    ENV['ADMIN_PASSWORD']              || 'password'
+set :admin_require_ssl, ENV['ADMIN_REQUIRE_SSL'] == 'true' || false
 
 helpers do  
   def authorized?
@@ -68,6 +68,7 @@ helpers do
   end
 end
 
+# authorize clients to admin section
 before do
   if admin_url?
     encription_required! if settings.admin_require_ssl && ! ssl?
@@ -78,6 +79,8 @@ before do
   end
 end
 
+# cache all responses to GET requests with http status 200 (OK) or 404 (Not Found)
+# but do not cache admin interface
 after do
   (cache_control :public, :max_age => settings.cache_max_age) if [404,200].include?(response.status) && request.get? && ! admin_url?
 end

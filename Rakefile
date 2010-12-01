@@ -15,9 +15,6 @@ namespace :db do
     DataMapper.auto_upgrade!
   end
   
-  # Need this to setup database uri as when loading required files
-  # RACK_ENV may not be set up properly if invoked from another taks
-  # as with :test
   # create_db_uri is defined in /lib/models.rb
   def setup_dm
     DataMapper.setup(:default, create_db_uri)
