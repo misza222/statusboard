@@ -1,5 +1,5 @@
-magpie
-======
+Statusboard
+===========
 Place for keeping history of statuses of your services independently of you application. It is similar in concept to [Heroku](http://status.heroku.com/) or [Github](http://status.github.com/) status pages.
 
 Main concepts
@@ -8,7 +8,7 @@ Service is a single service or application that you want to keep history for.
 
 Event is a single incident that is worth logging in for a specific service.
 
-Magpie uses [sinatra framework](http://www.sinatrarb.com/) with [DataMapper](http://datamapper.org/) as an ORM. [Bundler](http://gembundler.com/) is used for managing dependencies. On the view side there is [haml](http://haml-lang.com/) for generating xhtml and [yui-css](http://developer.yahoo.com/yui/grids/) as a [css framework](http://en.wikipedia.org/wiki/CSS_framework#CSS_framework).
+Statusboard uses [sinatra framework](http://www.sinatrarb.com/) with [DataMapper](http://datamapper.org/) as an ORM. [Bundler](http://gembundler.com/) is used for managing dependencies. On the view side there is [haml](http://haml-lang.com/) for generating xhtml and [yui-css](http://developer.yahoo.com/yui/grids/) as a [css framework](http://en.wikipedia.org/wiki/CSS_framework#CSS_framework).
 
 Demo
 ----
@@ -20,7 +20,7 @@ What was the idea?
 ------------------
 Fast and simple. And fully tested.
 
-Fast is important as typically status reporting applications receive spikes in traffic when your clients can't use your service. The simplicity means here an easy integration with external reporting systems - you can use REST to perform any action within magpie.
+Fast is important as typically status reporting applications receive spikes in traffic when your clients can't use your service. The simplicity means here an easy integration with external reporting systems - you can use REST to perform any action within statusboard.
 
 Features
 --------
@@ -38,15 +38,14 @@ Remember to update DataMapper adapter in Gemfile. Available adapters are listed 
 TODO: links to relevant guides.
 
 Deploying on [heroku](http://www.heroku.com/)
--------------------------------------------------
+---------------------------------------------
 It is really easy to deploy on [heroku](http://www.heroku.com/):
 
  * Install [heroku gem](http://docs.heroku.com/heroku-command),
- * clone this repo `git clone git@github.com:misza222/developer-console-tools.git`,
+ * clone this repo `git clone git@github.com:misza222/magpie.git`,
  * create new application on heroku `cd magpie` and `heroku create`
  * configure application login credentials for admin user `heroku config:add ADMIN_USER=username ADMIN_PASSWORD=user_password`
- * [optional] enforcing SSL encryption for admin actions `heroku addons:add ssl:piggyback` and `heroku config:add ADMIN_REQUIRE_SSL=true`; _as magpie uses simple http authentication which sends passwords as a clear text through the wire it is a good idea to take this step._
-
+ * [optional] enforcing SSL encryption for admin actions `heroku addons:add ssl:piggyback` and `heroku config:add ADMIN_REQUIRE_SSL=true`; _as statusboard uses simple http authentication which sends passwords as a clear text through the wire it is a good idea to take this step._
 
 Best practices
 --------------
