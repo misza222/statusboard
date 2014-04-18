@@ -23,49 +23,21 @@ end
 
 DataMapper.setup(:default, create_db_uri)
 
-class Service
+class Consumption
   include DataMapper::Resource
   
   property :id,    Serial
-  property :name,  String, :unique_index => true
-  property :description,  Text, :default => ''
+  property :value,    Integer, :default => 0
   
   property :created_at, DateTime
   property :updated_at, DateTime
   
-  has n, :events
-  
-  validates_presence_of :name
   
   def to_json(*a)
     {
-      :id => id,
-      :name => name,
-      :description => description
+      :value => value,
     }.to_json(*a)
   end
 end
 
-class Event
-  include DataMapper::Resource
-  
-  property :id,    Serial
-  property :name,  String
-  property :description,  Text, :default => ''
-  
-  property :created_at, DateTime
-  property :updated_at, DateTime
-  
-  belongs_to :service
-  
-  validates_presence_of :name
-  
-  def to_json(*a)
-    {
-      :id => id,
-      :name => name,
-      :description => description,
-      :service_id => service_id
-    }.to_json(*a)
-  end
-end
+DataMapper.auto_migrate!
